@@ -1,13 +1,13 @@
 // SPA State Store
 let currentCurrency = 'USD';
-let currentAmount = 50;
+let currentAmount = 59; // Default starting donation amount ($59)
 
-// Presets by Currency
+// Presets by Currency ($59, $99, $599, $999)
 const currencyPresets = {
-  USD: [10, 25, 50, 100],
-  EUR: [10, 25, 50, 100],
-  GBP: [10, 25, 50, 100],
-  INR: [500, 1500, 3500, 7500]
+  USD: [59, 99, 599, 999],
+  EUR: [59, 99, 599, 999],
+  GBP: [49, 89, 499, 899],
+  INR: [4999, 7999, 49999, 79999]
 };
 
 const currencySymbols = {
@@ -24,17 +24,23 @@ window.renderPresets = function() {
   const container = document.getElementById('preset-buttons-container');
   const symbol = currencySymbols[currentCurrency];
   const presets = currencyPresets[currentCurrency];
+  const customInput = document.getElementById('custom-amount-input');
 
   if (!container) return;
+
+  // Sync custom input with current selected amount
+  if (customInput && (!customInput.value || parseFloat(customInput.value) === currentAmount)) {
+    customInput.value = currentAmount;
+  }
 
   container.innerHTML = presets
     .map(
       amt => `
-    <button type="button" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3 rounded-xl border ${
+    <button type="button" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3.5 rounded-xl border ${
         amt === currentAmount
-          ? 'border-[#F59E0B] bg-[#F59E0B]/15 text-white font-bold'
-          : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium'
-      } text-xs text-center transition-all">
+          ? 'border-[#F59E0B] bg-[#F59E0B]/25 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-2 ring-[#F59E0B]/30'
+          : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium hover:border-white/30'
+      } text-sm text-center transition-all cursor-pointer">
       ${symbol}${amt}
     </button>
   `
@@ -49,18 +55,18 @@ window.renderPresets = function() {
 
 window.handleCurrencyChange = function(curr) {
   currentCurrency = curr;
-  currentAmount = currencyPresets[curr][2] || currencyPresets[curr][0]; // default to 3rd preset ($50/₹3500)
+  currentAmount = currencyPresets[curr][0]; // Default starts at 1st option ($59)
 
   const customInput = document.getElementById('custom-amount-input');
-  if (customInput) customInput.value = '';
+  if (customInput) customInput.value = currentAmount;
 
   window.renderPresets();
 };
 
 window.setPresetAmount = function(amt) {
-  currentAmount = amt;
+  currentAmount = parseFloat(amt);
   const customInput = document.getElementById('custom-amount-input');
-  if (customInput) customInput.value = '';
+  if (customInput) customInput.value = amt;
   window.renderPresets();
 };
 
@@ -128,17 +134,15 @@ window.triggerRazorpayCheckout = async function(event) {
       return;
     }
 
-    // 2. Configure Razorpay SDK Options
-    // Check if Razorpay SDK is loaded
     if (typeof Razorpay === 'undefined') {
       alert('Razorpay Checkout SDK is still loading or blocked. Please check your network connection.');
       return;
     }
 
     const options = {
-      key: orderData.keyId, // Your Razorpay API Key ID (Passed from backend / .env)
-      amount: orderData.amount, // Amount in smallest subunit (cents/paise)
-      currency: orderData.currency, // USD, EUR, GBP, or INR
+      key: orderData.keyId,
+      amount: orderData.amount,
+      currency: orderData.currency,
       name: "Journey with Ashutosh",
       description: "Expedition Support Donation",
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA6vsM5fBSZTVrMhkuBl8ZYRDKbuxV_s2m9Ngd5a6d4yeg56TbiPkJOv2nblN1a5DAW3uWNOsqS-U3mQNkTfusI5kaw77N5A-mohl3I-qHA50kIyuB_gZBprDxN60Utvbt0wdFq4n0_zndOhEtiZnLqN9uGJUB1eD3qQuc4ZPkmV4sY0nDKvK7UE8828psdd2y-S6KjanXihB7rHP5mimQQ58CRNoUAhvvm369mwdxczPkfDPPNfnK9",
@@ -153,18 +157,11 @@ window.triggerRazorpayCheckout = async function(event) {
         destination_bank: "Direct Deposit to Indian Bank Account"
       },
       theme: {
-        color: "#F59E0B" // Gold accent matching website aesthetic
+        color: "#F59E0B"
       },
       
-      // ====================================================================
-      // PAYMENT SUCCESS CALLBACK HANDLER
-      // Executed when the user successfully authorizes payment in the modal
-      // ====================================================================
       handler: async function (response) {
-        console.log("Razorpay Payment Success Callback Response:", response);
-
         try {
-          // Send signature to backend for server-side HMAC verification
           const verifyRes = await fetch('/api/donate/verify-razorpay-signature', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -186,16 +183,9 @@ window.triggerRazorpayCheckout = async function(event) {
           console.error('Callback verification error:', err);
           alert('Network error while verifying payment signature.');
         }
-      },
-      
-      modal: {
-        ondismiss: function () {
-          console.log("Razorpay payment modal closed by user.");
-        }
       }
     };
 
-    // 3. Launch Razorpay Payment Wizard
     const rzp1 = new Razorpay(options);
     rzp1.open();
 
@@ -265,16 +255,19 @@ window.closeModal = function() {
   document.getElementById('success-modal').classList.add('hidden');
 };
 
-// Format Card Number Input & Event Listeners
+// Event Listeners for Custom Input Synchronization
 document.addEventListener('DOMContentLoaded', () => {
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) {
+    customInput.value = currentAmount;
     customInput.addEventListener('input', e => {
       const val = parseFloat(e.target.value);
       if (!isNaN(val) && val > 0) {
         currentAmount = val;
-        window.renderPresets();
+      } else {
+        currentAmount = 0;
       }
+      window.renderPresets();
     });
   }
 
