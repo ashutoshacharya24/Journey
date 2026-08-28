@@ -20,21 +20,19 @@ const currencySymbols = {
 // --------------------------------------------------
 // Currency & Donation Amount Engine
 // --------------------------------------------------
+
+// Render preset buttons grid
 window.renderPresets = function() {
   const container = document.getElementById('preset-buttons-container');
   const symbol = currencySymbols[currentCurrency];
   const presets = currencyPresets[currentCurrency];
-  const customInput = document.getElementById('custom-amount-input');
 
   if (!container) return;
 
-  const isPresetMatch = presets.includes(currentAmount);
-
-  // 1. Render & highlight preset buttons
   container.innerHTML = presets
     .map(
       amt => `
-    <button type="button" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3.5 rounded-xl border ${
+    <button type="button" data-amount="${amt}" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3.5 rounded-xl border ${
         amt === currentAmount
           ? 'border-[#F59E0B] bg-[#F59E0B]/25 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-2 ring-[#F59E0B]/30'
           : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium hover:border-white/30'
@@ -45,32 +43,48 @@ window.renderPresets = function() {
     )
     .join('');
 
-  // 2. Sync and highlight custom input field
-  if (customInput) {
-    if (document.activeElement !== customInput && (customInput.value === '' || parseFloat(customInput.value) !== currentAmount)) {
-      customInput.value = currentAmount > 0 ? currentAmount : '';
-    }
+  const symbolEl = document.getElementById('form-currency-symbol');
+  if (symbolEl) symbolEl.innerText = symbol;
 
+  window.updateHighlights();
+};
+
+// Update highlights without mutating active typing state
+window.updateHighlights = function() {
+  const presets = currencyPresets[currentCurrency];
+  const customInput = document.getElementById('custom-amount-input');
+  const isPresetMatch = presets.includes(currentAmount);
+
+  // Update preset button styles
+  const buttons = document.querySelectorAll('.preset-btn');
+  buttons.forEach(btn => {
+    const amt = parseFloat(btn.getAttribute('data-amount'));
+    if (amt === currentAmount) {
+      btn.className =
+        'preset-btn p-3.5 rounded-xl border border-[#F59E0B] bg-[#F59E0B]/25 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-2 ring-[#F59E0B]/30 text-sm text-center transition-all cursor-pointer';
+    } else {
+      btn.className =
+        'preset-btn p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium hover:border-white/30 text-sm text-center transition-all cursor-pointer';
+    }
+  });
+
+  // Highlight custom input box if custom amount is typed
+  if (customInput) {
     if (!isPresetMatch && currentAmount > 0) {
-      // Highlight custom input when a unique custom amount is active
       customInput.classList.add('border-[#F59E0B]', 'bg-[#F59E0B]/10', 'ring-2', 'ring-[#F59E0B]/30');
       customInput.classList.remove('border-white/20');
     } else {
-      // Reset input highlighting when a preset button matches
       customInput.classList.remove('bg-[#F59E0B]/10', 'ring-2', 'ring-[#F59E0B]/30');
       customInput.classList.add('border-white/20');
     }
   }
-
-  const symbolEl = document.getElementById('form-currency-symbol');
-  if (symbolEl) symbolEl.innerText = symbol;
 
   window.updateButtonText();
 };
 
 window.handleCurrencyChange = function(curr) {
   currentCurrency = curr;
-  currentAmount = currencyPresets[curr][0]; // Default starts at 1st option ($59 / ₹4999)
+  currentAmount = currencyPresets[curr][0]; // Default to 1st option ($59 / ₹4999)
 
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = currentAmount;
@@ -82,7 +96,7 @@ window.setPresetAmount = function(amt) {
   currentAmount = parseFloat(amt);
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = amt;
-  window.renderPresets();
+  window.updateHighlights();
 };
 
 window.updateButtonText = function() {
@@ -125,7 +139,6 @@ window.triggerRazorpayCheckout = async function(event) {
   }
 
   try {
-    // 1. Create Razorpay Order on Express Backend
     const res = await fetch('/api/donate/create-razorpay-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -275,6 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) {
     customInput.value = currentAmount;
+    
+    // Live input handler
     customInput.addEventListener('input', e => {
       const val = parseFloat(e.target.value);
       if (!isNaN(val) && val > 0) {
@@ -282,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         currentAmount = 0;
       }
-      window.renderPresets();
+      window.updateHighlights();
     });
   }
 
