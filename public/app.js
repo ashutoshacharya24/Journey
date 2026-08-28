@@ -1,6 +1,7 @@
 // SPA State Store
 let currentCurrency = 'USD';
-let currentAmount = 59; // Default starting donation amount ($59)
+let selectedPreset = 59; // Default starting preset ($59)
+let currentAmount = 59;   // Default starting amount ($59)
 
 // Presets by Currency ($59, $99, $599, $999)
 const currencyPresets = {
@@ -33,7 +34,7 @@ window.renderPresets = function() {
     .map(
       amt => `
     <button type="button" data-amount="${amt}" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3.5 rounded-xl border ${
-        amt === currentAmount
+        amt === selectedPreset
           ? 'border-[#F59E0B] bg-[#F59E0B]/25 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-2 ring-[#F59E0B]/30'
           : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium hover:border-white/30'
       } text-sm text-center transition-all cursor-pointer">
@@ -49,17 +50,15 @@ window.renderPresets = function() {
   window.updateHighlights();
 };
 
-// Update highlights without mutating active typing state
+// Update preset highlights & input box styling
 window.updateHighlights = function() {
-  const presets = currencyPresets[currentCurrency];
   const customInput = document.getElementById('custom-amount-input');
-  const isPresetMatch = presets.includes(currentAmount);
 
-  // Update preset button styles
+  // Update preset button styles based strictly on selectedPreset
   const buttons = document.querySelectorAll('.preset-btn');
   buttons.forEach(btn => {
     const amt = parseFloat(btn.getAttribute('data-amount'));
-    if (amt === currentAmount) {
+    if (amt === selectedPreset) {
       btn.className =
         'preset-btn p-3.5 rounded-xl border border-[#F59E0B] bg-[#F59E0B]/25 text-white font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)] ring-2 ring-[#F59E0B]/30 text-sm text-center transition-all cursor-pointer';
     } else {
@@ -68,9 +67,9 @@ window.updateHighlights = function() {
     }
   });
 
-  // Highlight custom input box if custom amount is typed
+  // Highlight custom input box when typing custom amount (selectedPreset is null)
   if (customInput) {
-    if (!isPresetMatch && currentAmount > 0) {
+    if (selectedPreset === null && currentAmount > 0) {
       customInput.classList.add('border-[#F59E0B]', 'bg-[#F59E0B]/10', 'ring-2', 'ring-[#F59E0B]/30');
       customInput.classList.remove('border-white/20');
     } else {
@@ -84,7 +83,8 @@ window.updateHighlights = function() {
 
 window.handleCurrencyChange = function(curr) {
   currentCurrency = curr;
-  currentAmount = currencyPresets[curr][0]; // Default to 1st option ($59 / ₹4999)
+  selectedPreset = currencyPresets[curr][0]; // Default to 1st option ($59 / ₹4999)
+  currentAmount = selectedPreset;
 
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = currentAmount;
@@ -92,10 +92,14 @@ window.handleCurrencyChange = function(curr) {
   window.renderPresets();
 };
 
+// When user clicks a preset button -> updates custom input to match
 window.setPresetAmount = function(amt) {
-  currentAmount = parseFloat(amt);
+  selectedPreset = parseFloat(amt);
+  currentAmount = selectedPreset;
+
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = amt;
+
   window.updateHighlights();
 };
 
@@ -127,7 +131,7 @@ window.triggerRazorpayCheckout = async function(event) {
   }
 
   if (isNaN(currentAmount) || currentAmount <= 0) {
-    alert('Please select or enter a valid donation amount.');
+    alert('Please enter a valid donation amount greater than 0.');
     return;
   }
 
@@ -289,13 +293,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (customInput) {
     customInput.value = currentAmount;
     
-    // Live input handler
+    // Typing custom amount deselects preset buttons and uses user's input
     customInput.addEventListener('input', e => {
       const val = parseFloat(e.target.value);
+      selectedPreset = null; // Deselect preset buttons when typing custom input
+
       if (!isNaN(val) && val > 0) {
         currentAmount = val;
       } else {
-        currentAmount = 0;
+        currentAmount = 0; // If cleared, amount is 0
       }
       window.updateHighlights();
     });
