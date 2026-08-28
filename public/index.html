@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Journey with Ashutosh | Voyage Editorial</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#131315",
+            "surface": "#131315",
+            "surface-bright": "#39393b",
+            "surface-container-lowest": "#0e0e10",
+            "surface-container-low": "#1b1b1d",
+            "surface-container": "#1f1f21",
+            "surface-container-high": "#2a2a2b",
+            "surface-container-highest": "#353436",
+            "on-surface": "#e4e2e4",
+            "on-surface-variant": "#c6c6cd",
+            "outline": "#909097",
+            "outline-variant": "#45464d",
+            "primary": "#bec6e0",
+            "primary-container": "#0f172a",
+            "on-primary-container": "#798098",
+            "secondary": "#c4c7c9",
+            "secondary-container": "#464a4b",
+            "tertiary": "#a1cde3",
+            "accent-gold": "#F59E0B",
+            "background": "#131315"
+          },
+          fontFamily: {
+            display: ["Playfair Display", "serif"],
+            body: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body class="bg-[#131315] text-[#e4e2e4] font-body antialiased min-h-screen flex flex-col selection:bg-[#F59E0B] selection:text-[#0F172A]">
+
+  <!-- Top Glassmorphism Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-[#131315]/80 backdrop-blur-xl border-b border-[#c4c7c9]/10">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex justify-between items-center h-20">
+      <div class="flex items-center gap-10">
+        <a class="font-display text-2xl font-bold tracking-wider text-on-surface flex items-center gap-3 cursor-pointer" onclick="showSection('home')">
+          <span class="material-symbols-outlined text-[#F59E0B] text-3xl">explore</span>
+          VOYAGE
+        </a>
+        <div class="hidden md:flex items-center gap-2">
+          <button class="nav-link text-body-md text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2 rounded-lg" onclick="showSection('home')">Home</button>
+          <button class="nav-link text-body-md text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2 rounded-lg" onclick="showSection('destinations')">Destinations</button>
+          <button class="nav-link text-body-md text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2 rounded-lg" onclick="showSection('photography')">Photography</button>
+          <button class="nav-link text-body-md text-on-surface-variant hover:text-on-surface transition-colors px-4 py-2 rounded-lg" onclick="showSection('support')">Support</button>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center gap-4">
+        <button onclick="showSection('support')" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-6 py-3 font-bold text-xs uppercase tracking-widest transition-all scale-95 hover:scale-100 flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">favorite</span>
+          Support My Journey
+        </button>
+      </div>
+      <button class="md:hidden text-on-surface p-2" id="menuBtn">
+        <span class="material-symbols-outlined text-3xl">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Side Drawer -->
+  <div id="mobileNav" class="fixed inset-y-0 left-0 z-[60] flex flex-col p-8 h-full w-80 bg-[#19191c] border-r border-white/10 transition-transform duration-300 -translate-x-full md:hidden">
+    <div class="flex justify-between items-center mb-8">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#F59E0B]">explore</span>
+        <h2 class="font-display text-xl text-on-surface font-bold">VOYAGE</h2>
+      </div>
+      <button id="closeNavBtn" class="text-on-surface-variant hover:text-white"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div class="flex flex-col gap-4 flex-grow">
+      <button onclick="showSection('home'); toggleMobileNav();" class="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg text-on-surface font-medium text-left"><span class="material-symbols-outlined text-[#bec6e0]">home</span> Home</button>
+      <button onclick="showSection('destinations'); toggleMobileNav();" class="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg text-on-surface font-medium text-left"><span class="material-symbols-outlined text-[#bec6e0]">explore</span> Destinations</button>
+      <button onclick="showSection('photography'); toggleMobileNav();" class="flex items-center gap-4 p-3 hover:bg-white/5 rounded-lg text-on-surface font-medium text-left"><span class="material-symbols-outlined text-[#bec6e0]">photo_camera</span> Photography</button>
+      <button onclick="showSection('support'); toggleMobileNav();" class="flex items-center gap-4 p-3 bg-[#0F172A] rounded-lg text-[#F59E0B] font-bold text-left"><span class="material-symbols-outlined">volunteer_activism</span> Support My Journey</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow pt-24 md:pt-28">
+
+    <!-- 1. HOME SECTION -->
+    <section id="home-section" class="spa-page active">
+      <!-- Hero Banner -->
+      <div class="relative h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-10000" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#131315] via-[#131315]/60 to-[#131315]/30"></div>
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+          <span class="inline-block text-[#F59E0B] font-bold tracking-[0.25em] text-xs uppercase mb-6 border border-[#F59E0B]/30 px-4 py-2 rounded-full backdrop-blur-md">Independent Expedition Editorial</span>
+          <h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">Journey with Ashutosh</h1>
+          <p class="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            Documenting the world's most untouched polar wildernesses and remote frontiers. Storytelling unfiltered, independent, and ad-free.
+          </p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button onclick="showSection('destinations')" class="bg-[#bec6e0] hover:bg-white text-[#0F172A] px-8 py-4 font-bold text-xs uppercase tracking-widest transition-all">Explore Destinations</button>
+            <button onclick="showSection('support')" class="bg-transparent border border-white/30 hover:border-[#F59E0B] text-white hover:text-[#F59E0B] px-8 py-4 font-bold text-xs uppercase tracking-widest transition-all">Fund Next Expedition</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Stats -->
+      <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-16 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-white/10 text-center">
+        <div>
+          <div class="font-display text-4xl md:text-5xl font-bold text-white mb-2">42+</div>
+          <div class="text-xs uppercase tracking-widest text-on-surface-variant">Expeditions Completed</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl md:text-5xl font-bold text-[#F59E0B] mb-2">78° N</div>
+          <div class="text-xs uppercase tracking-widest text-on-surface-variant">Furthest Latitude</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl md:text-5xl font-bold text-white mb-2">12,000+</div>
+          <div class="text-xs uppercase tracking-widest text-on-surface-variant">Raw Photographs</div>
+        </div>
+        <div>
+          <div class="font-display text-4xl md:text-5xl font-bold text-[#a1cde3] mb-2">100%</div>
+          <div class="text-xs uppercase tracking-widest text-on-surface-variant">Community Funded</div>
+        </div>
+      </div>
+
+      <!-- Featured Expeditions Preview -->
+      <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-24">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+          <div>
+            <span class="text-xs uppercase tracking-[0.2em] text-[#F59E0B] font-bold">Featured Expeditions</span>
+            <h2 class="font-display text-3xl md:text-5xl font-bold text-white mt-2">Latest Journeys</h2>
+          </div>
+          <button onclick="showSection('destinations')" class="text-xs uppercase tracking-widest text-[#bec6e0] hover:text-white border-b border-[#bec6e0] pb-1 flex items-center gap-2">View All Destinations <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <!-- Antarctica Card -->
+          <div onclick="showSection('destinations')" class="group relative h-[480px] rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-[#F59E0B]/50 transition-all duration-500">
+            <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" style="background-image: url('https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/40 to-transparent"></div>
+            <div class="absolute inset-0 p-10 flex flex-col justify-end">
+              <span class="text-xs font-bold uppercase tracking-widest text-[#a1cde3] mb-2">Polar Ice Sheet · 70°S 110°E</span>
+              <h3 class="font-display text-3xl font-bold text-white mb-3">Antarctica Expedition</h3>
+              <p class="text-on-surface-variant text-sm line-clamp-2 max-w-lg mb-6">Crossing the Drake Passage into the silent white continent. Documenting glacier calving and emperor penguin colonies.</p>
+              <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#F59E0B]">Explore Journal <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+            </div>
+          </div>
+
+          <!-- Svalbard Card -->
+          <div onclick="showSection('destinations')" class="group relative h-[480px] rounded-2xl overflow-hidden cursor-pointer border border-white/10 hover:border-[#F59E0B]/50 transition-all duration-500">
+            <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/40 to-transparent"></div>
+            <div class="absolute inset-0 p-10 flex flex-col justify-end">
+              <span class="text-xs font-bold uppercase tracking-widest text-[#a1cde3] mb-2">High Arctic · 78°N 16°E</span>
+              <h3 class="font-display text-3xl font-bold text-white mb-3">Svalbard Wilderness</h3>
+              <p class="text-on-surface-variant text-sm line-clamp-2 max-w-lg mb-6">Navigating sea ice under the midnight sun. Tracking apex predators in the High Arctic archipelago.</p>
+              <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#F59E0B]">Explore Journal <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. DESTINATIONS SECTION -->
+    <section id="destinations-section" class="spa-page hidden">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-12">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs uppercase tracking-[0.25em] text-[#F59E0B] font-bold">Field Logs & Journals</span>
+          <h1 class="font-display text-4xl md:text-6xl font-bold text-white mt-3 mb-6">Expedition Destinations</h1>
+          <p class="text-on-surface-variant text-lg">Detailed field reports, geographical coordinates, and visual archives from remote corners of planet Earth.</p>
+        </div>
+
+        <!-- Antarctica Detail -->
+        <div class="bg-[#1E293B]/60 border border-white/10 rounded-2xl p-8 md:p-12 mb-16">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+            <div class="md:col-span-6 h-[400px] rounded-xl overflow-hidden bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="md:col-span-6 flex flex-col justify-center">
+              <div class="flex items-center gap-3 text-xs font-mono text-[#F59E0B] uppercase tracking-widest mb-4">
+                <span class="material-symbols-outlined text-sm">location_on</span> LAT 70° 45' S · LON 110° 22' E
+              </div>
+              <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-6">Antarctica: The White Horizon</h2>
+              <p class="text-on-surface-variant leading-relaxed mb-8">
+                An 18-day solo documentation journey through the icy Fjords of the Antarctic Peninsula. Navigating katabatic winds reaching 65 knots, capturing ice structures millions of years old.
+              </p>
+              <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-6 mb-8 text-sm">
+                <div><span class="block text-xs text-on-surface-variant uppercase">Temperature</span><span class="font-bold text-white">-34°C</span></div>
+                <div><span class="block text-xs text-on-surface-variant uppercase">Duration</span><span class="font-bold text-white">18 Days</span></div>
+                <div><span class="block text-xs text-on-surface-variant uppercase">Status</span><span class="font-bold text-[#a1cde3]">Completed</span></div>
+              </div>
+              <button onclick="showSection('photography')" class="bg-transparent border border-[#bec6e0] text-white hover:bg-white/10 px-6 py-3 font-bold text-xs uppercase tracking-widest w-fit">View Photo Gallery</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Svalbard Detail -->
+        <div class="bg-[#1E293B]/60 border border-white/10 rounded-2xl p-8 md:p-12">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+            <div class="md:col-span-6 md:order-2 h-[400px] rounded-xl overflow-hidden bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="md:col-span-6 md:order-1 flex flex-col justify-center">
+              <div class="flex items-center gap-3 text-xs font-mono text-[#F59E0B] uppercase tracking-widest mb-4">
+                <span class="material-symbols-outlined text-sm">location_on</span> LAT 78° 13' N · LON 15° 38' E
+              </div>
+              <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-6">Svalbard: Realm of the Polar Bear</h2>
+              <p class="text-on-surface-variant leading-relaxed mb-8">
+                Trekking across the frozen fjords of Spitsbergen under 24 hours of sunlight. Documenting wildlife resilience and shifting Arctic sea ice boundaries.
+              </p>
+              <div class="grid grid-cols-3 gap-4 border-t border-white/10 pt-6 mb-8 text-sm">
+                <div><span class="block text-xs text-on-surface-variant uppercase">Temperature</span><span class="font-bold text-white">-18°C</span></div>
+                <div><span class="block text-xs text-on-surface-variant uppercase">Duration</span><span class="font-bold text-white">14 Days</span></div>
+                <div><span class="block text-xs text-on-surface-variant uppercase">Status</span><span class="font-bold text-[#a1cde3]">Completed</span></div>
+              </div>
+              <button onclick="showSection('photography')" class="bg-transparent border border-[#bec6e0] text-white hover:bg-white/10 px-6 py-3 font-bold text-xs uppercase tracking-widest w-fit">View Photo Gallery</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PHOTOGRAPHY SECTION -->
+    <section id="photography-section" class="spa-page hidden">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-12">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs uppercase tracking-[0.25em] text-[#F59E0B] font-bold">Visual Archives</span>
+          <h1 class="font-display text-4xl md:text-6xl font-bold text-white mt-3 mb-6">Expedition Photography</h1>
+          <p class="text-on-surface-variant text-lg">A curated gallery of raw, un-edited high-resolution editorial imagery captured during polar expeditions.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="group relative h-[360px] rounded-xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop', 'Iceberg Formations, Antarctica')">
+            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop" alt="Iceberg" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+              <span class="text-white font-display text-lg font-bold">Iceberg Formations, Antarctica</span>
+            </div>
+          </div>
+
+          <div class="group relative h-[360px] rounded-xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1600&auto=format&fit=crop', 'Emperor Penguins, Weddell Sea')">
+            <img src="https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=800&auto=format&fit=crop" alt="Penguins" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+              <span class="text-white font-display text-lg font-bold">Emperor Penguins, Weddell Sea</span>
+            </div>
+          </div>
+
+          <div class="group relative h-[360px] rounded-xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1600&auto=format&fit=crop', 'Polar Glacier Wall, Svalbard')">
+            <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800&auto=format&fit=crop" alt="Glacier" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+              <span class="text-white font-display text-lg font-bold">Polar Glacier Wall, Svalbard</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SUPPORT MY JOURNEY (DONATION HUB WITH SECURE PAYMENTS & UPI QR) -->
+    <section id="support-section" class="spa-page hidden">
+      <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-12">
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="inline-flex items-center gap-2 bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+            <span class="material-symbols-outlined text-sm">shield</span> End-to-End Encrypted & Secure
+          </div>
+          <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-6">Help Fund the Next Expedition</h1>
+          <p class="text-on-surface-variant text-lg leading-relaxed">
+            VOYAGE is an independent editorial project. Your contribution directly fuels field equipment, permits, and logistic support. Every donation remains 100% ad-free and sponsor-transparent.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          <!-- LEFT COLUMN: Payment Configuration & Interactive Portal -->
+          <div class="lg:col-span-7 bg-[#1E293B] border border-white/10 rounded-2xl p-8 md:p-10 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/10 pb-6 mb-8">
+              <h2 class="font-display text-2xl font-bold text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#F59E0B]">volunteer_activism</span>
+                Select Contribution Amount
+              </h2>
+              <!-- Currency Switcher -->
+              <div class="flex items-center bg-[#131315] p-1 rounded-lg border border-white/10 text-xs font-bold">
+                <button onclick="setCurrency('INR')" id="curr-INR" class="curr-btn px-3 py-1.5 rounded-md bg-[#bec6e0] text-[#0F172A]">INR ₹</button>
+                <button onclick="setCurrency('USD')" id="curr-USD" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">USD $</button>
+                <button onclick="setCurrency('EUR')" id="curr-EUR" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">EUR €</button>
+                <button onclick="setCurrency('GBP')" id="curr-GBP" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">GBP £</button>
+              </div>
+            </div>
+
+            <!-- Amount Presets Grid -->
+            <div class="grid grid-cols-3 gap-4 mb-8" id="preset-container">
+              <!-- Dynamically populated based on currency -->
+            </div>
+
+            <!-- Custom Amount Input -->
+            <div class="mb-8">
+              <label class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Or Enter Custom Amount</label>
+              <div class="relative">
+                <span id="currency-symbol" class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-white">₹</span>
+                <input type="number" id="custom-amount-input" placeholder="Enter amount" min="1" class="w-full bg-[#131315] border border-white/20 rounded-xl pl-10 pr-4 py-3.5 text-white font-bold focus:border-[#F59E0B] focus:outline-none"/>
+              </div>
+            </div>
+
+            <!-- Payment Method Tabs -->
+            <div class="mb-8">
+              <label class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-3">Select Secure Payment Gateway</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button onclick="setPaymentTab('upi')" id="tab-upi" class="pay-tab p-3.5 rounded-xl border border-[#F59E0B] bg-[#F59E0B]/10 text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                  <span class="material-symbols-outlined">qr_code_2</span>
+                  <span>UPI / QR (India)</span>
+                </button>
+                <button onclick="setPaymentTab('card')" id="tab-card" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                  <span class="material-symbols-outlined">credit_card</span>
+                  <span>Card / Int'l</span>
+                </button>
+                <button onclick="setPaymentTab('paypal')" id="tab-paypal" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                  <span class="material-symbols-outlined">payments</span>
+                  <span>PayPal</span>
+                </button>
+                <button onclick="setPaymentTab('coffee')" id="tab-coffee" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                  <span class="material-symbols-outlined">local_cafe</span>
+                  <span>Buy Coffee</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- PAYMENT FORM PANELS -->
+
+            <!-- PANEL 1: UPI & DYNAMIC QR PAYMENTS -->
+            <div id="panel-upi" class="payment-panel space-y-6">
+              <div class="bg-[#131315] border border-white/10 rounded-xl p-6 text-center">
+                <div class="flex flex-col items-center justify-center">
+                  <!-- Live Generated Dynamic QR Code -->
+                  <div id="qr-container" class="bg-white p-3 rounded-xl mb-4 shadow-lg inline-block">
+                    <img id="qr-image" src="" alt="UPI Dynamic QR Code" class="w-48 h-48 object-contain hidden"/>
+                    <div id="qr-placeholder" class="w-48 h-48 flex items-center justify-center text-xs text-slate-500 font-medium">Generating QR...</div>
+                  </div>
+
+                  <p class="text-xs text-on-surface-variant mb-2">Scan with Google Pay, PhonePe, Paytm, BHIM, or any UPI App</p>
+                  
+                  <!-- Copy VPA Field -->
+                  <div class="flex items-center gap-2 bg-[#1E293B] border border-white/10 px-4 py-2 rounded-lg text-xs font-mono text-white mb-4">
+                    <span>UPI ID: <strong id="upi-vpa-display" class="text-[#a1cde3]">ashutosh@upi</strong></span>
+                    <button onclick="copyVPA()" class="text-[#F59E0B] hover:underline font-sans text-xs ml-2">Copy</button>
+                  </div>
+
+                  <!-- Mobile Intent Links -->
+                  <div class="flex flex-wrap gap-3 justify-center text-xs">
+                    <a id="intent-gpay" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> GPay</a>
+                    <a id="intent-phonepe" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> PhonePe</a>
+                    <a id="intent-paytm" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> Paytm</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- UTR Reference Submission -->
+              <div class="bg-[#131315] border border-white/10 rounded-xl p-6">
+                <h4 class="text-sm font-bold text-white mb-2">After Payment: Confirm Transaction Reference</h4>
+                <p class="text-xs text-on-surface-variant mb-4">Enter the 12-digit UTR / UPI Transaction Reference ID from your app to verify instant receipt.</p>
+                <div class="flex gap-3">
+                  <input type="text" id="utr-input" placeholder="e.g. 423819028412" class="flex-grow bg-[#1E293B] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                  <button onclick="verifyUtr()" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-5 py-2.5 font-bold text-xs rounded-lg uppercase tracking-wider">Verify</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANEL 2: INTERNATIONAL CARD PAYMENTS -->
+            <div id="panel-card" class="payment-panel hidden space-y-4">
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-xs text-on-surface-variant font-bold mb-1">Full Name on Card</label>
+                  <input type="text" id="card-name" placeholder="Ashutosh Acharya" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                </div>
+                <div>
+                  <label class="block text-xs text-on-surface-variant font-bold mb-1">Email (For Tax & Payment Receipt)</label>
+                  <input type="email" id="card-email" placeholder="ashutosh@example.com" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                </div>
+                <div>
+                  <label class="block text-xs text-on-surface-variant font-bold mb-1">Card Number (Tokenized & Encrypted)</label>
+                  <div class="relative">
+                    <input type="text" id="card-number" placeholder="4532 •••• •••• 8892" maxlength="19" class="w-full bg-[#131315] border border-white/20 rounded-lg pl-4 pr-12 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">credit_card</span>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs text-on-surface-variant font-bold mb-1">Expiry (MM/YY)</label>
+                    <input type="text" id="card-expiry" placeholder="12/28" maxlength="5" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-on-surface-variant font-bold mb-1">CVC / CVV</label>
+                    <input type="password" id="card-cvc" placeholder="•••" maxlength="4" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 text-xs text-slate-400 pt-2">
+                <span class="material-symbols-outlined text-green-400 text-sm">lock</span> 256-Bit TLS Encryption · PCI-DSS Compliant Gateway
+              </div>
+
+              <button onclick="processCardPayment()" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-xs py-3.5 rounded-xl uppercase tracking-widest transition-all">Complete International Payment</button>
+            </div>
+
+            <!-- PANEL 3: PAYPAL -->
+            <div id="panel-paypal" class="payment-panel hidden text-center py-8 space-y-4">
+              <span class="material-symbols-outlined text-5xl text-[#a1cde3]">account_balance_wallet</span>
+              <h3 class="text-lg font-bold text-white">Express Checkout via PayPal</h3>
+              <p class="text-xs text-on-surface-variant max-w-sm mx-auto">Redirecting to secure PayPal gateway for instant currency conversion.</p>
+              <button onclick="processPaypalPayment()" class="bg-[#0070BA] hover:bg-[#005ea6] text-white px-8 py-3 font-bold text-xs rounded-xl uppercase tracking-widest">Pay with PayPal</button>
+            </div>
+
+            <!-- PANEL 4: BUY ME A COFFEE -->
+            <div id="panel-coffee" class="payment-panel hidden text-center py-8 space-y-4">
+              <span class="material-symbols-outlined text-5xl text-[#F59E0B]">local_cafe</span>
+              <h3 class="text-lg font-bold text-white">Buy a Round of Coffee ($5 / ₹400 per cup)</h3>
+              <div class="flex justify-center gap-4 py-2">
+                <button onclick="setCustomAmount(5)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">1 Coffee ($5)</button>
+                <button onclick="setCustomAmount(15)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">3 Coffees ($15)</button>
+                <button onclick="setCustomAmount(25)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">5 Coffees ($25)</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: Bento Hub Info & Transparency -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Transparency Card -->
+            <div class="bg-[#1E293B] border border-white/10 rounded-2xl p-8">
+              <span class="material-symbols-outlined text-3xl text-[#a1cde3] mb-4">transparency</span>
+              <h3 class="font-display text-2xl font-bold text-white mb-3">Funding Breakdown</h3>
+              <p class="text-xs text-on-surface-variant leading-relaxed mb-6">Where your contribution goes:</p>
+              <div class="space-y-4 text-xs">
+                <div>
+                  <div class="flex justify-between text-white font-bold mb-1"><span>Polar Logistics & Vessel Charter</span><span>55%</span></div>
+                  <div class="w-full bg-[#131315] h-2 rounded-full"><div class="bg-[#F59E0B] h-2 rounded-full w-[55%]"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-white font-bold mb-1"><span>High-Alt/Cold Camera Gear</span><span>25%</span></div>
+                  <div class="w-full bg-[#131315] h-2 rounded-full"><div class="bg-[#bec6e0] h-2 rounded-full w-[25%]"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-white font-bold mb-1"><span>Satellite Comms & Safety</span><span>20%</span></div>
+                  <div class="w-full bg-[#131315] h-2 rounded-full"><div class="bg-[#a1cde3] h-2 rounded-full w-[20%]"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Supporter Perks Card -->
+            <div class="bg-[#1E293B] border border-white/10 rounded-2xl p-8">
+              <span class="material-symbols-outlined text-3xl text-[#F59E0B] mb-4">stars</span>
+              <h3 class="font-display text-2xl font-bold text-white mb-3">Supporter Recognition</h3>
+              <ul class="text-xs text-on-surface-variant space-y-3">
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Name credited in expedition documentaries</li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Access to full 4K desktop wallpapers archive</li>
+                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Quarterly dispatch newsletter from the field</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CONFIRMATION / SUCCESS MODAL -->
+  <div id="success-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 hidden">
+    <div class="bg-[#1E293B] border border-[#F59E0B]/50 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl relative">
+      <span class="material-symbols-outlined text-6xl text-[#F59E0B] mb-4">verified</span>
+      <h3 class="font-display text-2xl font-bold text-white mb-2">Contribution Verified!</h3>
+      <p class="text-xs text-on-surface-variant mb-6">Thank you for supporting **Journey with Ashutosh**. Your official receipt reference ID:</p>
+      <div id="modal-txn-id" class="bg-[#131315] border border-white/10 p-3 rounded-lg text-xs font-mono text-[#a1cde3] mb-6">TXN_20260828_8A9B</div>
+      <button onclick="closeModal()" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-xs py-3 rounded-xl uppercase tracking-widest">Close & Return</button>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX MODAL -->
+  <div id="lightbox-modal" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-6 hidden">
+    <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-3xl"><span class="material-symbols-outlined text-4xl">close</span></button>
+    <img id="lightbox-img" src="" alt="Lightbox" class="max-h-[80vh] max-w-[90vw] object-contain rounded-lg mb-4"/>
+    <div id="lightbox-caption" class="text-white font-display text-xl font-bold text-center"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="w-full py-12 bg-[#0e0e10] border-t border-white/10 mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div>
+        <span class="font-display text-xl font-bold text-white">VOYAGE EDITORIAL</span>
+        <p class="text-xs text-on-surface-variant mt-1">© 2026 Journey with Ashutosh. All Rights Reserved.</p>
+      </div>
+      <div class="flex gap-6 text-xs text-on-surface-variant">
+        <button onclick="showSection('home')" class="hover:text-white">Home</button>
+        <button onclick="showSection('destinations')" class="hover:text-white">Destinations</button>
+        <button onclick="showSection('photography')" class="hover:text-white">Photography</button>
+        <button onclick="showSection('support')" class="hover:text-white">Support</button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
