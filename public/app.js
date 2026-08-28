@@ -28,11 +28,9 @@ window.renderPresets = function() {
 
   if (!container) return;
 
-  // Sync custom input with current selected amount
-  if (customInput && (!customInput.value || parseFloat(customInput.value) === currentAmount)) {
-    customInput.value = currentAmount;
-  }
+  const isPresetMatch = presets.includes(currentAmount);
 
+  // 1. Render & highlight preset buttons
   container.innerHTML = presets
     .map(
       amt => `
@@ -47,6 +45,23 @@ window.renderPresets = function() {
     )
     .join('');
 
+  // 2. Sync and highlight custom input field
+  if (customInput) {
+    if (document.activeElement !== customInput && (customInput.value === '' || parseFloat(customInput.value) !== currentAmount)) {
+      customInput.value = currentAmount > 0 ? currentAmount : '';
+    }
+
+    if (!isPresetMatch && currentAmount > 0) {
+      // Highlight custom input when a unique custom amount is active
+      customInput.classList.add('border-[#F59E0B]', 'bg-[#F59E0B]/10', 'ring-2', 'ring-[#F59E0B]/30');
+      customInput.classList.remove('border-white/20');
+    } else {
+      // Reset input highlighting when a preset button matches
+      customInput.classList.remove('bg-[#F59E0B]/10', 'ring-2', 'ring-[#F59E0B]/30');
+      customInput.classList.add('border-white/20');
+    }
+  }
+
   const symbolEl = document.getElementById('form-currency-symbol');
   if (symbolEl) symbolEl.innerText = symbol;
 
@@ -55,7 +70,7 @@ window.renderPresets = function() {
 
 window.handleCurrencyChange = function(curr) {
   currentCurrency = curr;
-  currentAmount = currencyPresets[curr][0]; // Default starts at 1st option ($59)
+  currentAmount = currencyPresets[curr][0]; // Default starts at 1st option ($59 / ₹4999)
 
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = currentAmount;
@@ -74,7 +89,7 @@ window.updateButtonText = function() {
   const btnText = document.getElementById('donate-btn-text');
   const symbol = currencySymbols[currentCurrency];
   if (btnText) {
-    btnText.innerText = `Donate Now (${symbol}${currentAmount})`;
+    btnText.innerText = `Donate Now (${symbol}${currentAmount || 0})`;
   }
 };
 
