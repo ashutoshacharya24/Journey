@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Photography Portfolio | Journey with Ashutosh</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#131315",
+            "surface": "#131315",
+            "surface-bright": "#39393b",
+            "surface-container-lowest": "#0e0e10",
+            "surface-container-low": "#1b1b1d",
+            "surface-container": "#1f1f21",
+            "surface-container-high": "#2a2a2b",
+            "surface-container-highest": "#353436",
+            "on-surface": "#e4e2e4",
+            "on-surface-variant": "#c6c6cd",
+            "outline": "#909097",
+            "outline-variant": "#45464d",
+            "primary": "#bec6e0",
+            "primary-container": "#0f172a",
+            "on-primary-container": "#798098",
+            "secondary": "#c4c7c9",
+            "secondary-container": "#464a4b",
+            "tertiary": "#a1cde3",
+            "accent-gold": "#F59E0B",
+            "background": "#131315"
+          },
+          fontFamily: {
+            display: ["Playfair Display", "serif"],
+            body: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body class="bg-[#131315] text-[#e4e2e4] font-body antialiased min-h-screen flex flex-col selection:bg-[#F59E0B] selection:text-[#0F172A]">
+
+  <!-- Top Glassmorphism Navigation -->
+  <header class="fixed top-0 w-full z-50 bg-[#131315]/80 backdrop-blur-xl border-b border-[#c4c7c9]/10">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex justify-between items-center h-20">
+      <a class="font-display text-2xl font-bold tracking-wider text-on-surface flex items-center gap-3" href="/">
+        <span class="material-symbols-outlined text-[#F59E0B] text-3xl">explore</span>
+        VOYAGE
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/">Home</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/antarctica.html">Antarctica</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/svalbard.html">Svalbard</a>
+        <a class="text-[#F59E0B] font-bold border-b-2 border-[#F59E0B] pb-1" href="/photography.html">Photography</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/support.html">Support</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-4">
+        <a href="/support.html" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-6 py-3 font-bold text-xs uppercase tracking-widest transition-all scale-95 hover:scale-100 flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">favorite</span>
+          Support My Journey
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative h-[60vh] min-h-[450px] w-full flex items-center justify-center overflow-hidden bg-cover bg-center pt-20" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop');">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#131315] via-[#131315]/60 to-[#131315]/30"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+      <span class="inline-block text-[#F59E0B] font-bold tracking-[0.25em] text-xs uppercase mb-4">Editorial Visual Archives</span>
+      <h1 class="font-display text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">Capturing the Edge of the World</h1>
+      <p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+        Visual storytelling from the most remote regions on Earth. A cinematic exploration of isolation, extreme environments, and the raw beauty of untouched polar wilderness.
+      </p>
+    </div>
+  </section>
+
+  <!-- Gallery Grid Section -->
+  <section class="max-w-[1440px] mx-auto px-6 md:px-16 py-20">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      
+      <!-- Photo 1 -->
+      <div class="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600&auto=format&fit=crop', 'The Calving — Lemaire Channel, Antarctica')">
+        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop" alt="Iceberg" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+          <h3 class="font-display text-xl font-bold text-white mb-1">The Calving</h3>
+          <p class="text-xs text-[#a1cde3]">Lemaire Channel, Antarctica</p>
+        </div>
+      </div>
+
+      <!-- Photo 2 -->
+      <div class="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1600&auto=format&fit=crop', 'The Emperor — Snow Hill Island, Antarctica')">
+        <img src="https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=800&auto=format&fit=crop" alt="Penguin" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+          <h3 class="font-display text-xl font-bold text-white mb-1">The Emperor</h3>
+          <p class="text-xs text-[#a1cde3]">Snow Hill Island, Antarctica</p>
+        </div>
+      </div>
+
+      <!-- Photo 3 -->
+      <div class="group relative h-[400px] rounded-2xl overflow-hidden cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=1600&auto=format&fit=crop', 'Glacier Fractures — Spitsbergen, Svalbard')">
+        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=800&auto=format&fit=crop" alt="Glacier" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+          <h3 class="font-display text-xl font-bold text-white mb-1">Glacier Fractures</h3>
+          <p class="text-xs text-[#a1cde3]">Spitsbergen, Svalbard</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LIGHTBOX MODAL -->
+  <div id="lightbox-modal" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-6 hidden">
+    <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-3xl"><span class="material-symbols-outlined text-4xl">close</span></button>
+    <img id="lightbox-img" src="" alt="Lightbox" class="max-h-[80vh] max-w-[90vw] object-contain rounded-lg mb-4"/>
+    <div id="lightbox-caption" class="text-white font-display text-xl font-bold text-center"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full py-12 bg-[#0e0e10] border-t border-white/10 mt-auto">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div>
+        <span class="font-display text-xl font-bold text-white">VOYAGE EDITORIAL</span>
+        <p class="text-xs text-on-surface-variant mt-1">© 2026 Journey with Ashutosh. All Rights Reserved.</p>
+      </div>
+      <div class="flex gap-6 text-xs text-on-surface-variant">
+        <a href="/" class="hover:text-white">Home</a>
+        <a href="/antarctica.html" class="hover:text-white">Antarctica</a>
+        <a href="/svalbard.html" class="hover:text-white">Svalbard</a>
+        <a href="/photography.html" class="text-white">Photography</a>
+        <a href="/support.html" class="hover:text-white">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function openLightbox(src, title) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-caption').innerText = title;
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

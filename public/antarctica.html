@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Antarctica Expedition | Journey with Ashutosh</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-dim": "#131315",
+            "surface": "#131315",
+            "surface-bright": "#39393b",
+            "surface-container-lowest": "#0e0e10",
+            "surface-container-low": "#1b1b1d",
+            "surface-container": "#1f1f21",
+            "surface-container-high": "#2a2a2b",
+            "surface-container-highest": "#353436",
+            "on-surface": "#e4e2e4",
+            "on-surface-variant": "#c6c6cd",
+            "outline": "#909097",
+            "outline-variant": "#45464d",
+            "primary": "#bec6e0",
+            "primary-container": "#0f172a",
+            "on-primary-container": "#798098",
+            "secondary": "#c4c7c9",
+            "secondary-container": "#464a4b",
+            "tertiary": "#a1cde3",
+            "accent-gold": "#F59E0B",
+            "background": "#131315"
+          },
+          fontFamily: {
+            display: ["Playfair Display", "serif"],
+            body: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body class="bg-[#131315] text-[#e4e2e4] font-body antialiased min-h-screen flex flex-col selection:bg-[#F59E0B] selection:text-[#0F172A]">
+
+  <!-- Top Glassmorphism Navigation -->
+  <header class="fixed top-0 w-full z-50 bg-[#131315]/80 backdrop-blur-xl border-b border-[#c4c7c9]/10">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex justify-between items-center h-20">
+      <a class="font-display text-2xl font-bold tracking-wider text-on-surface flex items-center gap-3" href="/">
+        <span class="material-symbols-outlined text-[#F59E0B] text-3xl">explore</span>
+        VOYAGE
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/">Home</a>
+        <a class="text-[#F59E0B] font-bold border-b-2 border-[#F59E0B] pb-1" href="/antarctica.html">Antarctica</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/svalbard.html">Svalbard</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/photography.html">Photography</a>
+        <a class="text-on-surface-variant hover:text-white transition-colors" href="/support.html">Support</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-4">
+        <a href="/support.html" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-6 py-3 font-bold text-xs uppercase tracking-widest transition-all scale-95 hover:scale-100 flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">favorite</span>
+          Support My Journey
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative h-[70vh] min-h-[500px] w-full flex items-center justify-center overflow-hidden bg-cover bg-center pt-20" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000&auto=format&fit=crop');">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#131315] via-[#131315]/60 to-[#131315]/30"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+      <span class="inline-block text-[#a1cde3] font-mono tracking-[0.25em] text-xs uppercase mb-4">LAT 70° 45' S · LON 110° 22' E</span>
+      <h1 class="font-display text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">Antarctica: The White Horizon</h1>
+      <p class="text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+        An 18-day solo documentation journey through the icy Fjords of the Antarctic Peninsula. Navigating katabatic winds, ice structures millions of years old, and emperor penguin habitats.
+      </p>
+    </div>
+  </section>
+
+  <!-- Expedition Specs Bar -->
+  <section class="border-y border-white/10 bg-[#1E293B] py-8">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <span class="block text-xs text-on-surface-variant uppercase tracking-widest mb-1">Temperature</span>
+        <span class="font-display text-2xl font-bold text-white">-34° C</span>
+      </div>
+      <div>
+        <span class="block text-xs text-on-surface-variant uppercase tracking-widest mb-1">Expedition Length</span>
+        <span class="font-display text-2xl font-bold text-[#F59E0B]">18 Days</span>
+      </div>
+      <div>
+        <span class="block text-xs text-on-surface-variant uppercase tracking-widest mb-1">Vessel Charter</span>
+        <span class="font-display text-2xl font-bold text-white">M/V Arctic Endeavour</span>
+      </div>
+      <div>
+        <span class="block text-xs text-on-surface-variant uppercase tracking-widest mb-1">Status</span>
+        <span class="font-display text-2xl font-bold text-[#a1cde3]">Completed</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journal Narrative -->
+  <section class="py-20 max-w-4xl mx-auto px-6">
+    <h2 class="font-display text-3xl font-bold text-white mb-6">Journal Dispatch: Crossing the Drake</h2>
+    <p class="text-on-surface-variant leading-relaxed text-lg mb-8">
+      The waves of the Drake Passage rose over 9 meters as our vessel sliced through the churning Southern Ocean. For three days, there was no land in sight—only ocean petrels riding the gale-force winds. On the morning of the fourth day, the fog parted to reveal tabular icebergs the size of cathedrals floating silently in Paradise Harbor.
+    </p>
+
+    <div class="my-12 rounded-2xl overflow-hidden border border-white/10">
+      <img src="https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?q=80&w=1200&auto=format&fit=crop" alt="Emperor Penguins" class="w-full h-[450px] object-cover"/>
+      <div class="p-4 bg-[#1E293B] text-xs text-on-surface-variant italic">Emperor penguins gathering near the sea ice shelf in Paradise Harbor. Photo by Ashutosh.</div>
+    </div>
+
+    <h2 class="font-display text-3xl font-bold text-white mb-6">Preserving the Frozen Continent</h2>
+    <p class="text-on-surface-variant leading-relaxed text-lg mb-8">
+      Antarctica holds over 70% of the world's fresh water locked within its ice sheets. Documenting the subtle shifts in glacier walls provides a raw, undeniable testament to climate changes occurring across global ecosystems.
+    </p>
+
+    <div class="flex justify-between items-center bg-[#1E293B] border border-white/10 p-8 rounded-2xl mt-12">
+      <div>
+        <h3 class="font-display text-xl font-bold text-white mb-1">Support Future Expeditions</h3>
+        <p class="text-xs text-on-surface-variant">Help fund logistics, equipment, and field research for upcoming polar missions.</p>
+      </div>
+      <a href="/support.html" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-6 py-3 font-bold text-xs uppercase tracking-widest rounded-lg">Contribute Now</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="w-full py-12 bg-[#0e0e10] border-t border-white/10 mt-auto">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div>
+        <span class="font-display text-xl font-bold text-white">VOYAGE EDITORIAL</span>
+        <p class="text-xs text-on-surface-variant mt-1">© 2026 Journey with Ashutosh. All Rights Reserved.</p>
+      </div>
+      <div class="flex gap-6 text-xs text-on-surface-variant">
+        <a href="/" class="hover:text-white">Home</a>
+        <a href="/antarctica.html" class="text-white">Antarctica</a>
+        <a href="/svalbard.html" class="hover:text-white">Svalbard</a>
+        <a href="/photography.html" class="hover:text-white">Photography</a>
+        <a href="/support.html" class="hover:text-white">Support</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -19,7 +19,7 @@ const UPI_VPA = process.env.UPI_VPA || 'ashutosh@upi';
 const UPI_NAME = process.env.UPI_NAME || 'Journey with Ashutosh';
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'super_secret_webhook_key_2026_journey';
 
-// Audit storage for transactions (In-Memory database with persistence capabilities)
+// Audit storage for transactions
 const transactions = new Map();
 
 // 1. Security Headers via Helmet
@@ -59,7 +59,7 @@ app.use(
 // 2. CORS configuration
 app.use(cors({ origin: true, credentials: true }));
 
-// 3. Body Parsing with size limits
+// 3. Body Parsing
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
@@ -82,12 +82,29 @@ app.use(generalLimiter);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ----------------------------------------------------
+// PAGE ROUTES (Dedicated Standalone Pages)
+// ----------------------------------------------------
+
+app.get('/antarctica', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'antarctica.html'));
+});
+
+app.get('/svalbard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'svalbard.html'));
+});
+
+app.get('/photography', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'photography.html'));
+});
+
+app.get('/support', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'support.html'));
+});
+
+// ----------------------------------------------------
 // API ROUTES
 // ----------------------------------------------------
 
-/**
- * Health check endpoint
- */
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -113,14 +130,11 @@ app.post('/api/donate/initiate-upi', paymentLimiter, async (req, res) => {
     const cleanNote = sanitizeInput(note || 'Support Journey with Ashutosh');
     const txnId = generateTransactionId();
 
-    // Construct standard UPI Payment URI
-    // Format: upi://pay?pa=VPA&pn=NAME&am=AMOUNT&cu=INR&tn=NOTE&tr=TXN_ID
     const inrAmount = currency === 'INR' ? parsedAmount : (parsedAmount * 83).toFixed(2);
     const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(
       UPI_NAME
     )}&am=${inrAmount}&cu=INR&tn=${encodeURIComponent(cleanNote)}&tr=${txnId}`;
 
-    // Generate high-resolution QR code data URL
     const qrDataUrl = await QRCode.toDataURL(upiUri, {
       errorCorrectionLevel: 'H',
       margin: 2,
@@ -130,7 +144,6 @@ app.post('/api/donate/initiate-upi', paymentLimiter, async (req, res) => {
       }
     });
 
-    // Store pending transaction record
     const record = {
       id: txnId,
       type: 'UPI',
@@ -174,7 +187,6 @@ app.post('/api/donate/initiate-upi', paymentLimiter, async (req, res) => {
 
 /**
  * POST /api/donate/verify-upi
- * User submits UTR / Transaction ID after sending payment via UPI app
  */
 app.post('/api/donate/verify-upi', paymentLimiter, (req, res) => {
   try {
@@ -209,7 +221,6 @@ app.post('/api/donate/verify-upi', paymentLimiter, (req, res) => {
 
 /**
  * POST /api/donate/international
- * Handles international card payments with tokenization and fraud prevention checks
  */
 app.post('/api/donate/international', paymentLimiter, (req, res) => {
   try {
@@ -226,12 +237,10 @@ app.post('/api/donate/international', paymentLimiter, (req, res) => {
     const cleanEmail = sanitizeInput(email || '');
     const txnId = generateTransactionId();
 
-    // Token & Anti-Fraud verification check
     if (!cardToken || typeof cardToken !== 'string' || cardToken.length < 10) {
       return res.status(400).json({ error: 'Invalid or missing secure payment token.' });
     }
 
-    // Simulated Gateway Authorization & Processing
     const record = {
       id: txnId,
       type: paymentMethod || 'CARD_INTERNATIONAL',
@@ -263,7 +272,6 @@ app.post('/api/donate/international', paymentLimiter, (req, res) => {
 
 /**
  * GET /api/donate/status/:id
- * Retrieve real-time payment status
  */
 app.get('/api/donate/status/:id', (req, res) => {
   const txnId = req.params.id;
@@ -273,30 +281,7 @@ app.get('/api/donate/status/:id', (req, res) => {
   res.json({ success: true, transaction: transactions.get(txnId) });
 });
 
-/**
- * POST /api/donate/webhook
- * HMAC Signature validated webhook receiver for payment gateways (Stripe/Razorpay)
- */
-app.post('/api/donate/webhook', (req, res) => {
-  const signature = req.headers['x-signature'] || req.headers['stripe-signature'];
-  const rawPayload = JSON.stringify(req.body);
-
-  if (!signature || !verifyHmacSignature(rawPayload, signature, WEBHOOK_SECRET)) {
-    return res.status(401).json({ error: 'Unauthorized webhook signature.' });
-  }
-
-  const { event, transactionId, status } = req.body;
-  if (transactionId && transactions.has(transactionId)) {
-    const record = transactions.get(transactionId);
-    record.status = status || 'COMPLETED';
-    record.updatedAt = new Date().toISOString();
-    transactions.set(transactionId, record);
-  }
-
-  res.json({ received: true });
-});
-
-// Fallback for SPA routing
+// Fallback catch-all for SPA
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
