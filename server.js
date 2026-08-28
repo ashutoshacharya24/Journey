@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const QRCode = require('qrcode');
+const Razorpay = require('razorpay');
 
 const {
   generateTransactionId,
@@ -20,6 +21,19 @@ const UPI_NAME = process.env.UPI_NAME || 'Journey with Ashutosh';
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'super_secret_webhook_key_2026_journey';
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_JOURNEY_DEMO_KEY';
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_test_simulated_journey_secret';
+
+// Instantiate official Razorpay SDK if valid key secret present
+let razorpayInstance = null;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_ID !== 'rzp_test_JOURNEY_DEMO_KEY') {
+  try {
+    razorpayInstance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET
+    });
+  } catch (e) {
+    console.warn("Razorpay SDK initialization warning:", e.message);
+  }
+}
 
 // Audit storage for transactions
 const transactions = new Map();
@@ -129,7 +143,7 @@ app.get('/api/health', (req, res) => {
 
 /**
  * POST /api/donate/initiate-upi
- * Generates dynamic UPI payload and QR code
+ * Generates dynamic UPI payload and QR code for ANY dynamic amount (preset or custom)
  */
 app.post('/api/donate/initiate-upi', paymentLimiter, async (req, res) => {
   try {
@@ -235,7 +249,7 @@ app.post('/api/donate/verify-upi', paymentLimiter, (req, res) => {
 
 /**
  * POST /api/donate/create-razorpay-order
- * Creates an official Razorpay Order ID for international/domestic card & banking donations
+ * Creates an official Razorpay Order ID for ANY preset or custom amount requested by the donor
  */
 app.post('/api/donate/create-razorpay-order', paymentLimiter, async (req, res) => {
   try {
@@ -251,10 +265,28 @@ app.post('/api/donate/create-razorpay-order', paymentLimiter, async (req, res) =
 
     // Calculate amount in smallest subunit (cents for USD/EUR/GBP, paise for INR)
     const amountInSubunits = Math.round(parsedAmount * 100);
-    const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     const cleanName = sanitizeInput(donorName || 'International Donor');
     const cleanEmail = sanitizeInput(email || '');
     const cleanPhone = sanitizeInput(phone || '');
+
+    let orderId;
+
+    if (razorpayInstance) {
+      const rzpOrder = await razorpayInstance.orders.create({
+        amount: amountInSubunits,
+        currency: selectedCurrency,
+        receipt: `rcpt_${Date.now()}`,
+        notes: {
+          donor_name: cleanName,
+          donor_email: cleanEmail,
+          donor_phone: cleanPhone,
+          project: "Journey with Ashutosh"
+        }
+      });
+      orderId = rzpOrder.id;
+    } else {
+      orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    }
 
     const record = {
       id: orderId,
@@ -282,7 +314,7 @@ app.post('/api/donate/create-razorpay-order', paymentLimiter, async (req, res) =
     });
   } catch (err) {
     console.error('Error creating Razorpay order:', err);
-    res.status(500).json({ error: 'Failed to create Razorpay payment order.' });
+    res.status(500).json({ error: err.message || 'Failed to create Razorpay payment order.' });
   }
 });
 
@@ -299,7 +331,6 @@ app.post('/api/donate/verify-razorpay-signature', paymentLimiter, (req, res) => 
     }
 
     const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
-    // Generate signature check
     const expectedSignature = generateHmacSignature(payload, RAZORPAY_KEY_SECRET);
 
     if (transactions.has(razorpay_order_id)) {
