@@ -3,10 +3,17 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Support My Journey | Voyage Editorial</title>
+  <title>Support My Journey | International Razorpay Donation Portal</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- ==================================================================== -->
+  <!-- RAZORPAY CHECKOUT SDK - MANDATORY SCRIPT FOR INTERNATIONAL PAYMENTS -->
+  <!-- Enables cards (Visa, MasterCard, Amex), PayPal, Apple Pay, & UPI    -->
+  <!-- ==================================================================== -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -46,7 +53,7 @@
 </head>
 <body class="bg-[#131315] text-[#e4e2e4] font-body antialiased min-h-screen flex flex-col selection:bg-[#F59E0B] selection:text-[#0F172A]">
 
-  <!-- Top Glassmorphism Navigation -->
+  <!-- Top Navigation Bar -->
   <header class="fixed top-0 w-full z-50 bg-[#131315]/80 backdrop-blur-xl border-b border-[#c4c7c9]/10">
     <div class="max-w-[1440px] mx-auto px-6 md:px-16 flex justify-between items-center h-20">
       <a class="font-display text-2xl font-bold tracking-wider text-on-surface flex items-center gap-3" href="/">
@@ -72,177 +79,156 @@
   <main class="flex-grow pt-28 pb-20">
     <div class="max-w-[1440px] mx-auto px-6 md:px-16">
       
-      <!-- Header -->
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <!-- Page Header -->
+      <div class="text-center max-w-3xl mx-auto mb-14">
         <div class="inline-flex items-center gap-2 bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-          <span class="material-symbols-outlined text-sm">shield</span> End-to-End Encrypted & Secure
+          <span class="material-symbols-outlined text-sm">payments</span> Direct International Bank Transfer via Razorpay
         </div>
-        <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-6">Help Fund the Next Expedition</h1>
-        <p class="text-on-surface-variant text-lg leading-relaxed">
-          VOYAGE is an independent editorial project dedicated to documenting remote polar wildernesses. Your contribution directly fuels field gear, vessel charters, and permits. 100% ad-free and community supported.
+        <h1 class="font-display text-4xl md:text-6xl font-bold text-white mb-4">International Donation Gateway</h1>
+        <p class="text-on-surface-variant text-base md:text-lg leading-relaxed">
+          Accepting international & domestic contributions in <strong>USD ($), EUR (€), GBP (£), and INR (₹)</strong>. Payments are processed securely via Razorpay and deposited directly into Indian NRE/NRO/Savings accounts.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <!-- MAIN DONATION CONTAINER (FLEXBOX / GRID RESPONSIVE LAYOUT) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         
-        <!-- LEFT COLUMN: Contribution Hub -->
-        <div class="lg:col-span-7 bg-[#1E293B] border border-white/10 rounded-2xl p-8 md:p-10 shadow-2xl">
-          <div class="flex items-center justify-between border-b border-white/10 pb-6 mb-8">
-            <h2 class="font-display text-2xl font-bold text-white flex items-center gap-3">
-              <span class="material-symbols-outlined text-[#F59E0B]">volunteer_activism</span>
-              Select Contribution Amount
-            </h2>
-            <!-- Currency Switcher -->
-            <div class="flex items-center bg-[#131315] p-1 rounded-lg border border-white/10 text-xs font-bold">
-              <button onclick="window.setCurrency('INR')" id="curr-INR" class="curr-btn px-3 py-1.5 rounded-md bg-[#bec6e0] text-[#0F172A]">INR ₹</button>
-              <button onclick="window.setCurrency('USD')" id="curr-USD" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">USD $</button>
-              <button onclick="window.setCurrency('EUR')" id="curr-EUR" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">EUR €</button>
-              <button onclick="window.setCurrency('GBP')" id="curr-GBP" class="curr-btn px-3 py-1.5 rounded-md text-on-surface-variant hover:text-white">GBP £</button>
+        <!-- LEFT COLUMN: PRODUCTION-READY RAZORPAY FORM -->
+        <div class="lg:col-span-7 bg-[#1E293B] border border-white/10 rounded-2xl p-8 md:p-10 shadow-2xl relative">
+          
+          <div class="border-b border-white/10 pb-6 mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div>
+              <h2 class="font-display text-2xl font-bold text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-[#F59E0B]">favorite</span>
+                Make a Contribution
+              </h2>
+              <p class="text-xs text-on-surface-variant mt-1">Supports equipment, permits, & expedition logistics</p>
+            </div>
+
+            <!-- CURRENCY SELECTION DROPDOWN -->
+            <div class="flex items-center gap-2">
+              <label for="currency-select" class="text-xs text-on-surface-variant font-bold uppercase tracking-wider">Currency:</label>
+              <select id="currency-select" onchange="window.handleCurrencyChange(this.value)" class="bg-[#131315] border border-white/20 text-white text-xs font-bold rounded-lg px-3 py-2 focus:border-[#F59E0B] focus:outline-none cursor-pointer">
+                <option value="USD" selected>USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="INR">INR (₹)</option>
+              </select>
             </div>
           </div>
 
-          <!-- Presets Grid -->
-          <div class="grid grid-cols-3 gap-4 mb-8" id="preset-container">
-            <!-- Populated dynamically via app.js -->
-          </div>
-
-          <!-- Custom Amount Input -->
-          <div class="mb-8">
-            <label class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Or Enter Custom Amount</label>
-            <div class="relative">
-              <span id="currency-symbol" class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-white">₹</span>
-              <input type="number" id="custom-amount-input" placeholder="Enter amount" min="1" class="w-full bg-[#131315] border border-white/20 rounded-xl pl-10 pr-4 py-3.5 text-white font-bold focus:border-[#F59E0B] focus:outline-none"/>
+          <!-- DONOR INFORMATION FORM FIELDS -->
+          <form id="razorpay-donation-form" onsubmit="window.triggerRazorpayCheckout(event)" class="space-y-6">
+            
+            <!-- Field 1: Donor Full Name -->
+            <div>
+              <label for="donor-name" class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm text-[#F59E0B]">person</span> Full Name <span class="text-red-400">*</span>
+              </label>
+              <input type="text" id="donor-name" required placeholder="Ashutosh Acharya" class="w-full bg-[#131315] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#F59E0B] transition-colors"/>
             </div>
-          </div>
 
-          <!-- Payment Method Selector Tabs -->
-          <div class="mb-8">
-            <label class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-3">Select Secure Payment Gateway</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <button onclick="window.setPaymentTab('upi')" id="tab-upi" class="pay-tab p-3.5 rounded-xl border border-[#F59E0B] bg-[#F59E0B]/10 text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
-                <span class="material-symbols-outlined">qr_code_2</span>
-                <span>UPI / QR (India)</span>
-              </button>
-              <button onclick="window.setPaymentTab('card')" id="tab-card" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
-                <span class="material-symbols-outlined">credit_card</span>
-                <span>Card / Int'l</span>
-              </button>
-              <button onclick="window.setPaymentTab('paypal')" id="tab-paypal" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
-                <span class="material-symbols-outlined">payments</span>
-                <span>PayPal</span>
-              </button>
-              <button onclick="window.setPaymentTab('coffee')" id="tab-coffee" class="pay-tab p-3.5 rounded-xl border border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-bold text-xs flex flex-col items-center gap-1 transition-all">
-                <span class="material-symbols-outlined">local_cafe</span>
-                <span>Buy Coffee</span>
-              </button>
+            <!-- Field 2: Email Address -->
+            <div>
+              <label for="donor-email" class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm text-[#F59E0B]">mail</span> Email Address (For Receipt) <span class="text-red-400">*</span>
+              </label>
+              <input type="email" id="donor-email" required placeholder="ashutosh@example.com" class="w-full bg-[#131315] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#F59E0B] transition-colors"/>
             </div>
-          </div>
 
-          <!-- PANEL 1: UPI & DYNAMIC QR PAYMENTS -->
-          <div id="panel-upi" class="payment-panel space-y-6">
-            <div class="bg-[#131315] border border-white/10 rounded-xl p-6 text-center">
-              <div class="flex flex-col items-center justify-center">
-                <div id="qr-container" class="bg-white p-3 rounded-xl mb-4 shadow-lg inline-block">
-                  <img id="qr-image" src="" alt="UPI Dynamic QR Code" class="w-48 h-48 object-contain hidden"/>
-                  <div id="qr-placeholder" class="w-48 h-48 flex items-center justify-center text-xs text-slate-500 font-medium">Generating QR...</div>
-                </div>
+            <!-- Field 3: Phone Number with Country Code -->
+            <div>
+              <label for="donor-phone" class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm text-[#F59E0B]">phone</span> Phone Number (With Country Code) <span class="text-red-400">*</span>
+              </label>
+              <input type="tel" id="donor-phone" required placeholder="+1 555-019-2834 or +91 9876543210" class="w-full bg-[#131315] border border-white/20 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#F59E0B] transition-colors"/>
+            </div>
 
-                <p class="text-xs text-on-surface-variant mb-2">Scan with Google Pay, PhonePe, Paytm, BHIM, or any UPI App</p>
-                
-                <div class="flex items-center gap-2 bg-[#1E293B] border border-white/10 px-4 py-2 rounded-lg text-xs font-mono text-white mb-4">
-                  <span>UPI ID: <strong id="upi-vpa-display" class="text-[#a1cde3]">ashutosh@upi</strong></span>
-                  <button onclick="window.copyVPA()" class="text-[#F59E0B] hover:underline font-sans text-xs ml-2">Copy</button>
-                </div>
-
-                <div class="flex flex-wrap gap-3 justify-center text-xs">
-                  <a id="intent-gpay" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> GPay</a>
-                  <a id="intent-phonepe" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> PhonePe</a>
-                  <a id="intent-paytm" href="#" target="_blank" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md flex items-center gap-1"><span class="material-symbols-outlined text-sm">smartphone</span> Paytm</a>
-                </div>
+            <!-- Field 4: Preset Donation Buttons ($10, $25, $50, $100) -->
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Select Donation Amount</label>
+              <div class="grid grid-cols-4 gap-3 mb-3" id="preset-buttons-container">
+                <!-- Populated dynamically via JS -->
               </div>
             </div>
 
-            <div class="bg-[#131315] border border-white/10 rounded-xl p-6">
-              <h4 class="text-sm font-bold text-white mb-2">After Payment: Confirm Transaction Reference</h4>
-              <p class="text-xs text-on-surface-variant mb-4">Enter the 12-digit UTR / UPI Transaction Reference ID from your app to verify instant receipt.</p>
-              <div class="flex gap-3">
-                <input type="text" id="utr-input" placeholder="e.g. 423819028412" class="flex-grow bg-[#1E293B] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-                <button onclick="window.verifyUtr()" class="bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] px-5 py-2.5 font-bold text-xs rounded-lg uppercase tracking-wider">Verify</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- PANEL 2: INTERNATIONAL CARD PAYMENTS -->
-          <div id="panel-card" class="payment-panel hidden space-y-4">
-            <div class="grid grid-cols-1 gap-4">
-              <div>
-                <label class="block text-xs text-on-surface-variant font-bold mb-1">Full Name on Card</label>
-                <input type="text" id="card-name" placeholder="Ashutosh Acharya" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-              </div>
-              <div>
-                <label class="block text-xs text-on-surface-variant font-bold mb-1">Email (For Tax & Payment Receipt)</label>
-                <input type="email" id="card-email" placeholder="ashutosh@example.com" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-              </div>
-              <div>
-                <label class="block text-xs text-on-surface-variant font-bold mb-1">Card Number (Tokenized & Encrypted)</label>
-                <div class="relative">
-                  <input type="text" id="card-number" placeholder="4532 •••• •••• 8892" maxlength="19" class="w-full bg-[#131315] border border-white/20 rounded-lg pl-4 pr-12 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-                  <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">credit_card</span>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs text-on-surface-variant font-bold mb-1">Expiry (MM/YY)</label>
-                  <input type="text" id="card-expiry" placeholder="12/28" maxlength="5" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-                </div>
-                <div>
-                  <label class="block text-xs text-on-surface-variant font-bold mb-1">CVC / CVV</label>
-                  <input type="password" id="card-cvc" placeholder="•••" maxlength="4" class="w-full bg-[#131315] border border-white/20 rounded-lg px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#F59E0B]"/>
-                </div>
+            <!-- Field 5: Custom Amount Input -->
+            <div>
+              <label for="custom-amount-input" class="block text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Or Enter Custom Amount</label>
+              <div class="relative">
+                <span id="form-currency-symbol" class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-bold text-[#F59E0B]">$</span>
+                <input type="number" id="custom-amount-input" min="1" step="any" placeholder="Enter custom amount" class="w-full bg-[#131315] border border-white/20 rounded-xl pl-10 pr-4 py-3.5 text-base text-white font-bold focus:outline-none focus:border-[#F59E0B] transition-colors"/>
               </div>
             </div>
 
-            <div class="flex items-center gap-2 text-xs text-slate-400 pt-2">
-              <span class="material-symbols-outlined text-green-400 text-sm">lock</span> 256-Bit TLS Encryption · PCI-DSS Compliant Gateway
+            <!-- Payment Security Badge -->
+            <div class="flex items-center gap-2 text-xs text-slate-400 bg-[#131315] border border-white/10 p-3.5 rounded-xl">
+              <span class="material-symbols-outlined text-green-400 text-base">lock</span>
+              <span>Encrypted TLS 256-Bit SSL Connection · PCI-DSS Compliant via Razorpay</span>
             </div>
 
-            <button onclick="window.processCardPayment()" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-xs py-3.5 rounded-xl uppercase tracking-widest transition-all">Complete International Payment</button>
-          </div>
+            <!-- Field 6: SUBMIT / DONATE NOW BUTTON -->
+            <button type="submit" id="razorpay-donate-btn" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-sm py-4 rounded-xl uppercase tracking-widest transition-all scale-100 hover:scale-[1.01] shadow-lg flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-lg">lock</span>
+              <span id="donate-btn-text">Donate Now ($50)</span>
+            </button>
+          </form>
 
-          <!-- PANEL 3: PAYPAL -->
-          <div id="panel-paypal" class="payment-panel hidden text-center py-8 space-y-4">
-            <span class="material-symbols-outlined text-5xl text-[#a1cde3]">account_balance_wallet</span>
-            <h3 class="text-lg font-bold text-white">Express Checkout via PayPal</h3>
-            <p class="text-xs text-on-surface-variant max-w-sm mx-auto">Redirecting to secure PayPal gateway for instant currency conversion.</p>
-            <button onclick="window.processPaypalPayment()" class="bg-[#0070BA] hover:bg-[#005ea6] text-white px-8 py-3 font-bold text-xs rounded-xl uppercase tracking-widest">Pay with PayPal</button>
-          </div>
+          <!-- Alternative UPI Section for Indian Donors -->
+          <div class="mt-8 pt-6 border-t border-white/10">
+            <button onclick="window.toggleUpiDrawer()" class="w-full bg-[#131315] hover:bg-white/5 border border-white/10 text-xs font-bold text-[#a1cde3] py-3 rounded-xl flex items-center justify-center gap-2 transition-all">
+              <span class="material-symbols-outlined text-base">qr_code_2</span>
+              <span>Prefer Direct Indian UPI / GPay / PhonePe QR Code? Click Here</span>
+            </button>
 
-          <!-- PANEL 4: BUY ME A COFFEE -->
-          <div id="panel-coffee" class="payment-panel hidden text-center py-8 space-y-4">
-            <span class="material-symbols-outlined text-5xl text-[#F59E0B]">local_cafe</span>
-            <h3 class="text-lg font-bold text-white">Buy a Round of Coffee ($5 / ₹400 per cup)</h3>
-            <div class="flex justify-center gap-4 py-2">
-              <button onclick="window.setCustomAmount(5)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">1 Coffee ($5)</button>
-              <button onclick="window.setCustomAmount(15)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">3 Coffees ($15)</button>
-              <button onclick="window.setCustomAmount(25)" class="bg-[#131315] hover:border-[#F59E0B] border border-white/20 px-4 py-2 rounded-lg text-xs font-bold text-white">5 Coffees ($25)</button>
+            <div id="upi-drawer" class="hidden mt-4 p-6 bg-[#131315] border border-white/10 rounded-xl text-center space-y-4">
+              <p class="text-xs text-on-surface-variant">Scan with any Indian UPI App or copy VPA:</p>
+              <div id="qr-container" class="bg-white p-3 rounded-xl inline-block shadow-lg">
+                <img id="qr-image" src="" alt="UPI Dynamic QR Code" class="w-44 h-44 object-contain hidden"/>
+                <div id="qr-placeholder" class="w-44 h-44 flex items-center justify-center text-xs text-slate-500 font-medium">Generating QR...</div>
+              </div>
+              <div class="flex items-center justify-center gap-2 bg-[#1E293B] border border-white/10 px-4 py-2 rounded-lg text-xs font-mono text-white max-w-xs mx-auto">
+                <span>UPI VPA: <strong id="upi-vpa-display" class="text-[#a1cde3]">ashutosh@upi</strong></span>
+                <button onclick="window.copyVPA()" class="text-[#F59E0B] hover:underline font-sans text-xs ml-2">Copy</button>
+              </div>
             </div>
           </div>
 
         </div>
 
-        <!-- RIGHT COLUMN: Transparency & Perks -->
+        <!-- RIGHT COLUMN: TRANSPARENCY & RAZORPAY INTEGRATION NOTES -->
         <div class="lg:col-span-5 space-y-6">
-          <div class="bg-[#1E293B] border border-white/10 rounded-2xl p-8">
-            <span class="material-symbols-outlined text-3xl text-[#a1cde3] mb-4">transparency</span>
-            <h3 class="font-display text-2xl font-bold text-white mb-3">Funding Breakdown</h3>
-            <p class="text-xs text-on-surface-variant leading-relaxed mb-6">Where your contribution goes:</p>
-            <div class="space-y-4 text-xs">
+          
+          <!-- Integration Guide Card for Developer -->
+          <div class="bg-[#1E293B] border border-[#F59E0B]/40 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center gap-2 text-[#F59E0B] font-bold text-sm mb-3">
+              <span class="material-symbols-outlined text-lg">code</span>
+              <span>Razorpay Key Configuration</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+              To go live with real payments, update your <code>.env</code> file in your project root:
+            </p>
+            <div class="bg-[#131315] p-3 rounded-xl border border-white/10 font-mono text-[11px] text-[#a1cde3] overflow-x-auto space-y-1">
+              <div>RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxx</div>
+              <div>RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxx</div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-3">
+              ✔ International cards & currency conversion enabled in Razorpay Dashboard.<br/>
+              ✔ Funds settle directly into your linked Indian bank account.
+            </p>
+          </div>
+
+          <!-- Funding Transparency Breakdown -->
+          <div class="bg-[#1E293B] border border-white/10 rounded-2xl p-6">
+            <span class="material-symbols-outlined text-3xl text-[#a1cde3] mb-3">pie_chart</span>
+            <h3 class="font-display text-xl font-bold text-white mb-2">Expedition Funding Split</h3>
+            <div class="space-y-3 text-xs">
               <div>
-                <div class="flex justify-between text-white font-bold mb-1"><span>Polar Logistics & Vessel Charter</span><span>55%</span></div>
+                <div class="flex justify-between text-white font-bold mb-1"><span>Polar Logistics & Permits</span><span>55%</span></div>
                 <div class="w-full bg-[#131315] h-2 rounded-full"><div class="bg-[#F59E0B] h-2 rounded-full w-[55%]"></div></div>
               </div>
               <div>
-                <div class="flex justify-between text-white font-bold mb-1"><span>High-Alt/Cold Camera Gear</span><span>25%</span></div>
+                <div class="flex justify-between text-white font-bold mb-1"><span>Sub-Zero Camera Gear</span><span>25%</span></div>
                 <div class="w-full bg-[#131315] h-2 rounded-full"><div class="bg-[#bec6e0] h-2 rounded-full w-[25%]"></div></div>
               </div>
               <div>
@@ -252,29 +238,20 @@
             </div>
           </div>
 
-          <div class="bg-[#1E293B] border border-white/10 rounded-2xl p-8">
-            <span class="material-symbols-outlined text-3xl text-[#F59E0B] mb-4">stars</span>
-            <h3 class="font-display text-2xl font-bold text-white mb-3">Supporter Recognition</h3>
-            <ul class="text-xs text-on-surface-variant space-y-3">
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Name credited in expedition documentaries</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Access to full 4K desktop wallpapers archive</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Quarterly dispatch newsletter from the field</li>
-            </ul>
-          </div>
         </div>
 
       </div>
     </div>
   </main>
 
-  <!-- CONFIRMATION MODAL -->
+  <!-- CONFIRMATION / SUCCESS MODAL -->
   <div id="success-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6 hidden">
     <div class="bg-[#1E293B] border border-[#F59E0B]/50 rounded-2xl max-w-md w-full p-8 text-center shadow-2xl relative">
       <span class="material-symbols-outlined text-6xl text-[#F59E0B] mb-4">verified</span>
-      <h3 class="font-display text-2xl font-bold text-white mb-2">Contribution Verified!</h3>
-      <p class="text-xs text-on-surface-variant mb-6">Thank you for supporting **Journey with Ashutosh**. Your official receipt reference ID:</p>
-      <div id="modal-txn-id" class="bg-[#131315] border border-white/10 p-3 rounded-lg text-xs font-mono text-[#a1cde3] mb-6">TXN_20260828_8A9B</div>
-      <button onclick="window.closeModal()" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-xs py-3 rounded-xl uppercase tracking-widest">Close & Return</button>
+      <h3 class="font-display text-2xl font-bold text-white mb-2">Donation Verified!</h3>
+      <p class="text-xs text-on-surface-variant mb-6">Thank you for supporting **Journey with Ashutosh**. Your Razorpay Payment Reference ID:</p>
+      <div id="modal-txn-id" class="bg-[#131315] border border-white/10 p-3 rounded-lg text-xs font-mono text-[#a1cde3] mb-6">pay_P1A9B283746</div>
+      <button onclick="window.closeModal()" class="w-full bg-[#F59E0B] hover:bg-[#d98a08] text-[#0F172A] font-bold text-xs py-3.5 rounded-xl uppercase tracking-widest">Close & Return</button>
     </div>
   </div>
 

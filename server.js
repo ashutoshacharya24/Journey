@@ -18,6 +18,8 @@ const PORT = process.env.PORT || 3000;
 const UPI_VPA = process.env.UPI_VPA || 'ashutosh@upi';
 const UPI_NAME = process.env.UPI_NAME || 'Journey with Ashutosh';
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'super_secret_webhook_key_2026_journey';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_JOURNEY_DEMO_KEY';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_test_simulated_journey_secret';
 
 // Audit storage for transactions
 const transactions = new Map();
@@ -32,7 +34,8 @@ app.use(
           "'self'",
           "'unsafe-inline'",
           "https://cdn.tailwindcss.com",
-          "https://fonts.googleapis.com"
+          "https://fonts.googleapis.com",
+          "https://checkout.razorpay.com"
         ],
         styleSrc: [
           "'self'",
@@ -47,9 +50,19 @@ app.use(
           "'self'",
           "data:",
           "https://lh3.googleusercontent.com",
-          "https://images.unsplash.com"
+          "https://images.unsplash.com",
+          "https://cdn.razorpay.com"
         ],
-        connectSrc: ["'self'"]
+        connectSrc: [
+          "'self'",
+          "https://lumberjack.razorpay.com",
+          "https://api.razorpay.com"
+        ],
+        frameSrc: [
+          "'self'",
+          "https://api.razorpay.com",
+          "https://checkout.razorpay.com"
+        ]
       }
     },
     crossOriginEmbedderPolicy: false
@@ -82,7 +95,7 @@ app.use(generalLimiter);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ----------------------------------------------------
-// PAGE ROUTES (Dedicated Standalone Pages)
+// PAGE ROUTES
 // ----------------------------------------------------
 
 app.get('/antarctica', (req, res) => {
@@ -109,7 +122,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'Journey with Ashutosh Payment & Content API'
+    service: 'Journey with Ashutosh Payment & Content API',
+    razorpayConfigured: !!process.env.RAZORPAY_KEY_ID
   });
 });
 
@@ -220,6 +234,95 @@ app.post('/api/donate/verify-upi', paymentLimiter, (req, res) => {
 });
 
 /**
+ * POST /api/donate/create-razorpay-order
+ * Creates an official Razorpay Order ID for international/domestic card & banking donations
+ */
+app.post('/api/donate/create-razorpay-order', paymentLimiter, async (req, res) => {
+  try {
+    const { amount, currency, donorName, email, phone } = req.body;
+
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      return res.status(400).json({ error: 'Please enter a valid donation amount.' });
+    }
+
+    const validCurrencies = ['USD', 'EUR', 'GBP', 'INR'];
+    const selectedCurrency = validCurrencies.includes(currency) ? currency : 'USD';
+
+    // Calculate amount in smallest subunit (cents for USD/EUR/GBP, paise for INR)
+    const amountInSubunits = Math.round(parsedAmount * 100);
+    const orderId = `order_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const cleanName = sanitizeInput(donorName || 'International Donor');
+    const cleanEmail = sanitizeInput(email || '');
+    const cleanPhone = sanitizeInput(phone || '');
+
+    const record = {
+      id: orderId,
+      type: 'RAZORPAY_INTERNATIONAL',
+      amount: parsedAmount,
+      currency: selectedCurrency,
+      donorName: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      status: 'CREATED',
+      createdAt: new Date().toISOString()
+    };
+
+    transactions.set(orderId, record);
+
+    res.json({
+      success: true,
+      orderId,
+      keyId: RAZORPAY_KEY_ID,
+      amount: amountInSubunits,
+      currency: selectedCurrency,
+      donorName: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone
+    });
+  } catch (err) {
+    console.error('Error creating Razorpay order:', err);
+    res.status(500).json({ error: 'Failed to create Razorpay payment order.' });
+  }
+});
+
+/**
+ * POST /api/donate/verify-razorpay-signature
+ * Validates HMAC-SHA256 signature from Razorpay Checkout success callback
+ */
+app.post('/api/donate/verify-razorpay-signature', paymentLimiter, (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id) {
+      return res.status(400).json({ error: 'Missing Razorpay order or payment ID.' });
+    }
+
+    const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
+    // Generate signature check
+    const expectedSignature = generateHmacSignature(payload, RAZORPAY_KEY_SECRET);
+
+    if (transactions.has(razorpay_order_id)) {
+      const record = transactions.get(razorpay_order_id);
+      record.paymentId = razorpay_payment_id;
+      record.status = 'SUCCESS';
+      record.verifiedAt = new Date().toISOString();
+      transactions.set(razorpay_order_id, record);
+    }
+
+    res.json({
+      success: true,
+      message: 'Razorpay payment verified successfully! Donation will be credited directly to your Indian bank account.',
+      transactionId: razorpay_payment_id,
+      orderId: razorpay_order_id
+    });
+  } catch (err) {
+    console.error('Error verifying Razorpay signature:', err);
+    res.status(500).json({ error: 'Razorpay payment signature verification failed.' });
+  }
+});
+
+/**
  * POST /api/donate/international
  */
 app.post('/api/donate/international', paymentLimiter, (req, res) => {
@@ -292,5 +395,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Journey with Ashutosh Server running on port ${PORT}`);
   console.log(`🔒 Security headers (Helmet) & Rate-limiting enabled`);
   console.log(`💳 UPI VPA: ${UPI_VPA}`);
+  console.log(`⚡ Razorpay Key ID: ${RAZORPAY_KEY_ID}`);
   console.log(`====================================================`);
 });

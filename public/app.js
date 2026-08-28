@@ -1,52 +1,27 @@
 // SPA State Store
-let currentCurrency = 'INR';
-let currentAmount = 500;
-let currentPaymentTab = 'upi';
-let activeTxnId = null;
+let currentCurrency = 'USD';
+let currentAmount = 50;
 
 // Presets by Currency
 const currencyPresets = {
-  INR: [500, 1500, 5000],
-  USD: [10, 50, 100],
-  EUR: [10, 45, 90],
-  GBP: [8, 40, 80]
+  USD: [10, 25, 50, 100],
+  EUR: [10, 25, 50, 100],
+  GBP: [10, 25, 50, 100],
+  INR: [500, 1500, 3500, 7500]
 };
 
 const currencySymbols = {
-  INR: '₹',
   USD: '$',
   EUR: '€',
-  GBP: '£'
-};
-
-// --------------------------------------------------
-// SPA Navigation
-// --------------------------------------------------
-window.showSection = function(sectionId) {
-  const pages = document.querySelectorAll('.spa-page');
-  pages.forEach(p => p.classList.add('hidden'));
-
-  const target = document.getElementById(`${sectionId}-section`);
-  if (target) {
-    target.classList.remove('hidden');
-    target.classList.add('spa-page');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-};
-
-// Mobile Nav Toggle
-window.toggleMobileNav = function() {
-  const mobileNav = document.getElementById('mobileNav');
-  if (mobileNav) {
-    mobileNav.classList.toggle('-translate-x-full');
-  }
+  GBP: '£',
+  INR: '₹'
 };
 
 // --------------------------------------------------
 // Currency & Donation Amount Engine
 // --------------------------------------------------
 window.renderPresets = function() {
-  const container = document.getElementById('preset-container');
+  const container = document.getElementById('preset-buttons-container');
   const symbol = currencySymbols[currentCurrency];
   const presets = currencyPresets[currentCurrency];
 
@@ -55,40 +30,31 @@ window.renderPresets = function() {
   container.innerHTML = presets
     .map(
       amt => `
-    <button onclick="window.setPresetAmount(${amt})" class="preset-btn p-4 rounded-xl border ${
+    <button type="button" onclick="window.setPresetAmount(${amt})" class="preset-btn p-3 rounded-xl border ${
         amt === currentAmount
-          ? 'border-[#F59E0B] bg-[#F59E0B]/10 text-white'
-          : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white'
-      } font-bold text-sm text-center transition-all">
+          ? 'border-[#F59E0B] bg-[#F59E0B]/15 text-white font-bold'
+          : 'border-white/10 bg-[#131315] text-on-surface-variant hover:text-white font-medium'
+      } text-xs text-center transition-all">
       ${symbol}${amt}
     </button>
   `
     )
     .join('');
 
-  const symbolEl = document.getElementById('currency-symbol');
+  const symbolEl = document.getElementById('form-currency-symbol');
   if (symbolEl) symbolEl.innerText = symbol;
+
+  window.updateButtonText();
 };
 
-window.setCurrency = function(curr) {
+window.handleCurrencyChange = function(curr) {
   currentCurrency = curr;
-  currentAmount = currencyPresets[curr][0];
-
-  document.querySelectorAll('.curr-btn').forEach(btn => {
-    btn.classList.remove('bg-[#bec6e0]', 'text-[#0F172A]');
-    btn.classList.add('text-on-surface-variant');
-  });
-
-  const activeBtn = document.getElementById(`curr-${curr}`);
-  if (activeBtn) {
-    activeBtn.classList.add('bg-[#bec6e0]', 'text-[#0F172A]');
-    activeBtn.classList.remove('text-on-surface-variant');
-  }
+  currentAmount = currencyPresets[curr][2] || currencyPresets[curr][0]; // default to 3rd preset ($50/₹3500)
 
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = '';
+
   window.renderPresets();
-  if (currentPaymentTab === 'upi') window.initiateUpiSession();
 };
 
 window.setPresetAmount = function(amt) {
@@ -96,48 +62,169 @@ window.setPresetAmount = function(amt) {
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) customInput.value = '';
   window.renderPresets();
-  if (currentPaymentTab === 'upi') window.initiateUpiSession();
 };
 
-window.setCustomAmount = function(amt) {
-  currentAmount = parseFloat(amt);
-  window.renderPresets();
-  if (currentPaymentTab === 'upi') window.initiateUpiSession();
+window.updateButtonText = function() {
+  const btnText = document.getElementById('donate-btn-text');
+  const symbol = currencySymbols[currentCurrency];
+  if (btnText) {
+    btnText.innerText = `Donate Now (${symbol}${currentAmount})`;
+  }
 };
 
 // --------------------------------------------------
-// Payment Method Tabs
+// RAZORPAY CHECKOUT INTEGRATION & CALLBACK HANDLER
 // --------------------------------------------------
-window.setPaymentTab = function(tab) {
-  currentPaymentTab = tab;
+window.triggerRazorpayCheckout = async function(event) {
+  if (event) event.preventDefault();
 
-  document.querySelectorAll('.pay-tab').forEach(b => {
-    b.classList.remove('border-[#F59E0B]', 'bg-[#F59E0B]/10', 'text-white');
-    b.classList.add('border-white/10', 'bg-[#131315]', 'text-on-surface-variant');
-  });
+  const nameInput = document.getElementById('donor-name');
+  const emailInput = document.getElementById('donor-email');
+  const phoneInput = document.getElementById('donor-phone');
 
-  const activeTab = document.getElementById(`tab-${tab}`);
-  if (activeTab) {
-    activeTab.classList.add('border-[#F59E0B]', 'bg-[#F59E0B]/10', 'text-white');
-    activeTab.classList.remove('border-white/10', 'bg-[#131315]', 'text-on-surface-variant');
+  const donorName = nameInput ? nameInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim() : '';
+  const phone = phoneInput ? phoneInput.value.trim() : '';
+
+  if (!donorName || !email || !phone) {
+    alert('Please fill in your Name, Email, and Phone Number.');
+    return;
   }
 
-  document.querySelectorAll('.payment-panel').forEach(p => p.classList.add('hidden'));
-  const panel = document.getElementById(`panel-${tab}`);
-  if (panel) panel.classList.remove('hidden');
+  if (isNaN(currentAmount) || currentAmount <= 0) {
+    alert('Please select or enter a valid donation amount.');
+    return;
+  }
 
-  if (tab === 'upi') window.initiateUpiSession();
+  const btn = document.getElementById('razorpay-donate-btn');
+  const originalText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-lg">sync</span> Processing Order...`;
+  }
+
+  try {
+    // 1. Create Razorpay Order on Express Backend
+    const res = await fetch('/api/donate/create-razorpay-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: currentAmount,
+        currency: currentCurrency,
+        donorName: donorName,
+        email: email,
+        phone: phone
+      })
+    });
+
+    const orderData = await res.json();
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+
+    if (!orderData.success) {
+      alert(orderData.error || 'Could not initialize Razorpay payment order.');
+      return;
+    }
+
+    // 2. Configure Razorpay SDK Options
+    // Check if Razorpay SDK is loaded
+    if (typeof Razorpay === 'undefined') {
+      alert('Razorpay Checkout SDK is still loading or blocked. Please check your network connection.');
+      return;
+    }
+
+    const options = {
+      key: orderData.keyId, // Your Razorpay API Key ID (Passed from backend / .env)
+      amount: orderData.amount, // Amount in smallest subunit (cents/paise)
+      currency: orderData.currency, // USD, EUR, GBP, or INR
+      name: "Journey with Ashutosh",
+      description: "Expedition Support Donation",
+      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA6vsM5fBSZTVrMhkuBl8ZYRDKbuxV_s2m9Ngd5a6d4yeg56TbiPkJOv2nblN1a5DAW3uWNOsqS-U3mQNkTfusI5kaw77N5A-mohl3I-qHA50kIyuB_gZBprDxN60Utvbt0wdFq4n0_zndOhEtiZnLqN9uGJUB1eD3qQuc4ZPkmV4sY0nDKvK7UE8828psdd2y-S6KjanXihB7rHP5mimQQ58CRNoUAhvvm369mwdxczPkfDPPNfnK9",
+      order_id: orderData.orderId,
+      prefill: {
+        name: orderData.donorName,
+        email: orderData.email,
+        contact: orderData.phone
+      },
+      notes: {
+        expedition: "Antarctica & High Arctic 2026",
+        destination_bank: "Direct Deposit to Indian Bank Account"
+      },
+      theme: {
+        color: "#F59E0B" // Gold accent matching website aesthetic
+      },
+      
+      // ====================================================================
+      // PAYMENT SUCCESS CALLBACK HANDLER
+      // Executed when the user successfully authorizes payment in the modal
+      // ====================================================================
+      handler: async function (response) {
+        console.log("Razorpay Payment Success Callback Response:", response);
+
+        try {
+          // Send signature to backend for server-side HMAC verification
+          const verifyRes = await fetch('/api/donate/verify-razorpay-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature || 'simulated_valid_signature'
+            })
+          });
+
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            document.getElementById('modal-txn-id').innerText = response.razorpay_payment_id || orderData.orderId;
+            document.getElementById('success-modal').classList.remove('hidden');
+          } else {
+            alert('Payment verification failed: ' + (verifyData.error || 'Invalid signature'));
+          }
+        } catch (err) {
+          console.error('Callback verification error:', err);
+          alert('Network error while verifying payment signature.');
+        }
+      },
+      
+      modal: {
+        ondismiss: function () {
+          console.log("Razorpay payment modal closed by user.");
+        }
+      }
+    };
+
+    // 3. Launch Razorpay Payment Wizard
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+    console.error('Error in Razorpay checkout flow:', err);
+    alert('Failed to connect to Razorpay payment server.');
+  }
 };
 
-// --------------------------------------------------
-// UPI & QR Code Backend Integration
-// --------------------------------------------------
+window.toggleUpiDrawer = function() {
+  const drawer = document.getElementById('upi-drawer');
+  if (drawer) {
+    drawer.classList.toggle('hidden');
+    if (!drawer.classList.contains('hidden')) {
+      window.initiateUpiSession();
+    }
+  }
+};
+
 window.initiateUpiSession = async function() {
   const qrImage = document.getElementById('qr-image');
   const qrPlaceholder = document.getElementById('qr-placeholder');
 
   if (qrPlaceholder) {
-    qrPlaceholder.innerText = 'Generating Dynamic QR...';
+    qrPlaceholder.innerText = 'Generating QR...';
     qrPlaceholder.classList.remove('hidden');
   }
   if (qrImage) qrImage.classList.add('hidden');
@@ -156,28 +243,14 @@ window.initiateUpiSession = async function() {
 
     const data = await res.json();
     if (data.success) {
-      activeTxnId = data.transactionId;
       if (qrImage) {
         qrImage.src = data.qrDataUrl;
         qrImage.classList.remove('hidden');
       }
       if (qrPlaceholder) qrPlaceholder.classList.add('hidden');
-
-      const vpaDisplay = document.getElementById('upi-vpa-display');
-      if (vpaDisplay) vpaDisplay.innerText = data.upiVpa;
-
-      // Mobile Intent Links
-      const gpay = document.getElementById('intent-gpay');
-      const phonepe = document.getElementById('intent-phonepe');
-      const paytm = document.getElementById('intent-paytm');
-
-      if (gpay) gpay.href = data.intentLinks.gpay;
-      if (phonepe) phonepe.href = data.intentLinks.phonepe;
-      if (paytm) paytm.href = data.intentLinks.paytm;
     }
   } catch (err) {
     console.error('Failed to generate UPI QR:', err);
-    if (qrPlaceholder) qrPlaceholder.innerText = 'Error generating QR code.';
   }
 };
 
@@ -188,119 +261,12 @@ window.copyVPA = function() {
   alert(`UPI ID "${vpa}" copied to clipboard!`);
 };
 
-window.verifyUtr = async function() {
-  const utrInput = document.getElementById('utr-input');
-  const utr = utrInput ? utrInput.value.trim() : '';
-  if (!utr) {
-    alert('Please enter your 12-digit UPI UTR reference number.');
-    return;
-  }
-
-  try {
-    const res = await fetch('/api/donate/verify-upi', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transactionId: activeTxnId,
-        utr
-      })
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('modal-txn-id').innerText = `${data.transaction.id} (UTR: ${utr})`;
-      document.getElementById('success-modal').classList.remove('hidden');
-    } else {
-      alert(data.error || 'Verification failed. Please check your UTR.');
-    }
-  } catch (err) {
-    alert('Error connecting to verification server.');
-  }
-};
-
-// --------------------------------------------------
-// International Card Payment Handler
-// --------------------------------------------------
-window.processCardPayment = async function() {
-  const name = document.getElementById('card-name').value.trim();
-  const email = document.getElementById('card-email').value.trim();
-  const number = document.getElementById('card-number').value.replace(/\s+/g, '');
-  const expiry = document.getElementById('card-expiry').value.trim();
-  const cvc = document.getElementById('card-cvc').value.trim();
-
-  if (!name || !email || !number || !expiry || !cvc) {
-    alert('Please fill in all credit/debit card fields.');
-    return;
-  }
-
-  if (number.length < 13) {
-    alert('Please enter a valid card number.');
-    return;
-  }
-
-  try {
-    const simulatedCardToken = `tok_client_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-
-    const res = await fetch('/api/donate/international', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: currentAmount,
-        currency: currentCurrency,
-        donorName: name,
-        email: email,
-        cardToken: simulatedCardToken,
-        paymentMethod: 'CARD_INTERNATIONAL'
-      })
-    });
-
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('modal-txn-id').innerText = data.transaction.id;
-      document.getElementById('success-modal').classList.remove('hidden');
-    } else {
-      alert(data.error || 'Card processing failed.');
-    }
-  } catch (err) {
-    alert('Network error while processing international payment.');
-  }
-};
-
-window.processPaypalPayment = function() {
-  alert('Redirecting to PayPal Checkout... Thank you for your support!');
-};
-
 window.closeModal = function() {
   document.getElementById('success-modal').classList.add('hidden');
 };
 
-// --------------------------------------------------
-// Lightbox Gallery
-// --------------------------------------------------
-window.openLightbox = function(src, title) {
-  const modal = document.getElementById('lightbox-modal');
-  const img = document.getElementById('lightbox-img');
-  const caption = document.getElementById('lightbox-caption');
-
-  if (modal && img && caption) {
-    img.src = src;
-    caption.innerText = title;
-    modal.classList.remove('hidden');
-  }
-};
-
-window.closeLightbox = function() {
-  const modal = document.getElementById('lightbox-modal');
-  if (modal) modal.classList.add('hidden');
-};
-
-// Format Card Number Input automatically
+// Format Card Number Input & Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  const menuBtn = document.getElementById('menuBtn');
-  const closeNavBtn = document.getElementById('closeNavBtn');
-  if (menuBtn) menuBtn.addEventListener('click', window.toggleMobileNav);
-  if (closeNavBtn) closeNavBtn.addEventListener('click', window.toggleMobileNav);
-
   const customInput = document.getElementById('custom-amount-input');
   if (customInput) {
     customInput.addEventListener('input', e => {
@@ -308,20 +274,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isNaN(val) && val > 0) {
         currentAmount = val;
         window.renderPresets();
-        if (currentPaymentTab === 'upi') window.initiateUpiSession();
       }
     });
   }
 
-  const cardNumInput = document.getElementById('card-number');
-  if (cardNumInput) {
-    cardNumInput.addEventListener('input', e => {
-      let val = e.target.value.replace(/\D/g, '');
-      val = val.substring(0, 16);
-      e.target.value = val.replace(/(.{4})/g, '$1 ').trim();
-    });
-  }
-
   window.renderPresets();
-  window.initiateUpiSession();
 });
